@@ -6,10 +6,9 @@ import { useLoader } from "@/contexts/loader-context";
 
 const POINTS = [
 	"Full-Stack Product Builder",
-	"AI-Driven System Design",
+	"Ai-Driven System Design",
 	"Co-Founder of Singularity Works",
 	"iOS Developer",
-	"CS Undergrad",
 ] as const;
 
 export default function BottomText() {
@@ -18,7 +17,7 @@ export default function BottomText() {
 	return (
 		<div
 			style={{
-				position: "fixed",
+				position: "absolute",
 				bottom: "2rem",
 				left: 0,
 				right: 0,

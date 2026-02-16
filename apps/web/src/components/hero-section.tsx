@@ -152,75 +152,76 @@ export default function HeroSection() {
 	}
 
 	return (
-		<>
-			<div
-				ref={containerRef}
-				style={{
-					position: "fixed",
-					inset: 0,
-					display: "flex",
-					alignItems: "center",
-					justifyContent: "center",
-					opacity: 0,
-					pointerEvents: loaderComplete ? "auto" : "none",
-				}}
-			>
-				<div style={{ position: "relative" }}>
-					<span
-						style={{
-							position: "absolute",
-							bottom: "100%",
-							left: "-20%",
-							marginBottom: "0.25em",
-							fontFamily: "var(--font-telma)",
-							fontStyle: "italic",
-							fontSize: "clamp(1.25rem, 4vw, 2rem)",
-							color: "rgba(255, 255, 255, 0.8)",
-							whiteSpace: "nowrap",
-						}}
+		<div
+			ref={containerRef}
+			style={{
+				position: "sticky",
+				top: 0,
+				zIndex: 1,
+				width: "100%",
+				height: "100svh",
+				display: "flex",
+				alignItems: "center",
+				justifyContent: "center",
+				opacity: 0,
+				pointerEvents: loaderComplete ? "auto" : "none",
+			}}
+		>
+			<div style={{ position: "relative" }}>
+				<span
+					style={{
+						position: "absolute",
+						bottom: "100%",
+						left: "-20%",
+						marginBottom: "0.25em",
+						fontFamily: "var(--font-telma)",
+						fontStyle: "italic",
+						fontSize: "clamp(1.25rem, 4vw, 2rem)",
+						color: "rgba(255, 255, 255, 0.8)",
+						whiteSpace: "nowrap",
+					}}
+				>
+					hey, i&apos;m
+				</span>
+				<div
+					aria-hidden="true"
+					onBlur={handleMouseLeave}
+					onFocus={handleMouseEnter}
+					onPointerEnter={handleMouseEnter}
+					onPointerLeave={handleMouseLeave}
+					role="presentation"
+					style={{
+						cursor: "default",
+						userSelect: "none",
+						width: "clamp(280px, 70vw, 600px)",
+					}}
+				>
+					<svg
+						aria-labelledby="hero-name-title"
+						role="img"
+						style={{ width: "100%", height: "auto", display: "block" }}
+						viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
+						xmlns="http://www.w3.org/2000/svg"
 					>
-						hey, i&apos;m
-					</span>
-					<div
-						aria-hidden="true"
-						onBlur={handleMouseLeave}
-						onFocus={handleMouseEnter}
-						onPointerEnter={handleMouseEnter}
-						onPointerLeave={handleMouseLeave}
-						role="presentation"
-						style={{
-							cursor: "default",
-							userSelect: "none",
-							width: "clamp(280px, 70vw, 600px)",
-						}}
-					>
-						<svg
-							aria-labelledby="hero-name-title"
-							role="img"
-							style={{ width: "100%", height: "auto", display: "block" }}
-							viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
-							xmlns="http://www.w3.org/2000/svg"
-						>
-							<title id="hero-name-title">koustubh</title>
-							{LETTER_PATHS.map((letter, i) => (
-								<path
-									d={letter.d}
-									fill="rgba(255, 255, 255, 0)"
-									key={letter.char + String(i)}
-									ref={(el) => {
-										pathRefs.current[i] = el;
-									}}
-									stroke="rgba(255, 255, 255, 0.8)"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									strokeWidth="1.5"
-								/>
-							))}
-						</svg>
-					</div>
+						<title id="hero-name-title">koustubh</title>
+						{LETTER_PATHS.map((letter, i) => (
+							<path
+								d={letter.d}
+								fill="rgba(255, 255, 255, 0)"
+								key={letter.char + String(i)}
+								ref={(el) => {
+									pathRefs.current[i] = el;
+								}}
+								stroke="rgba(255, 255, 255, 0.8)"
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth="1.5"
+							/>
+						))}
+					</svg>
 				</div>
 			</div>
 			<BottomText />
-		</>
+		</div>
 	);
 }

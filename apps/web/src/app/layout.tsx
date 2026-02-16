@@ -65,7 +65,7 @@ export default function RootLayout({
 				className={`${geistSans.variable} ${geistMono.variable} ${jetbrainsMono.variable} ${telma.variable} antialiased`}
 			>
 				<Providers>
-					<div className="grid h-svh grid-rows-[auto_1fr]">
+					<div className="grid min-h-svh grid-rows-[auto_1fr]">
 						<Header />
 						{children}
 					</div>
