@@ -1,10 +1,17 @@
 "use client";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 import { ModeToggle } from "./mode-toggle";
 
 export default function Header() {
+	const pathname = usePathname();
+	const isHome = pathname === "/";
 	const links = [{ to: "/", label: "Home" }] as const;
+
+	if (isHome) {
+		return null;
+	}
 
 	return (
 		<div>

@@ -21,9 +21,13 @@ export default function IntroLoader({
 }: {
 	children: React.ReactNode;
 }) {
-	const { isLoading, startFadeOut, setLoaderComplete } = useLoader();
+	const { isLoading, isFadingOut, startFadeOut, setLoaderComplete } =
+		useLoader();
 	const [shouldAnimate, setShouldAnimate] = useState(false);
-	const overlayRef = useRef<HTMLDivElement>(null);
+	const topPanelRef = useRef<HTMLDivElement>(null);
+	const bottomPanelRef = useRef<HTMLDivElement>(null);
+	const textContainerRef = useRef<HTMLDivElement>(null);
+	const lineRef = useRef<HTMLDivElement>(null);
 	const lettersRef = useRef<(HTMLSpanElement | null)[]>([]);
 	const whiteLayersRef = useRef<(HTMLSpanElement | null)[]>([]);
 	const timelineRef = useRef<gsap.core.Timeline | null>(null);
@@ -74,44 +78,97 @@ export default function IntroLoader({
 			clipPath: "inset(100% 0 0 0)",
 		});
 
-		tl.to({}, { duration: 0.6 });
+		// Initialize progress line at zero scale, expanding from center
+		gsap.set(lineRef.current, {
+			scaleX: 0,
+			transformOrigin: "center center",
+		});
 
+		// --- Phase 1: Initial pause ---
+		tl.to({}, { duration: 0.54 });
+
+		// --- Phase 2: "kstb" white layer reveal ---
 		tl.to(shortWhiteLayers, {
 			clipPath: "inset(0% 0 0 0)",
-			duration: 1.8,
-			stagger: 0.225,
+			duration: 1.62,
+			stagger: 0.2025,
 			ease: "power2.inOut",
 		});
 
-		tl.to({}, { duration: 0.525 });
+		tl.to({}, { duration: 0.4725 });
 
+		// Mark the point where "kstb" starts expanding to "koustubh" (line starts here)
+		tl.addLabel("expandStart");
+
+		// --- Phase 3: Hidden vowel letters expand ---
 		tl.to(hiddenLetters, {
 			width: "auto",
-			duration: 1.2,
+			duration: 1.08,
 			ease: "power3.inOut",
-			stagger: 0.09,
+			stagger: 0.081,
 		});
 
 		tl.to(
 			hiddenLetters,
 			{
 				opacity: 1,
-				duration: 0.75,
-				stagger: 0.09,
+				duration: 0.675,
+				stagger: 0.081,
 				ease: "power2.out",
 			},
-			"-=0.75"
+			"-=0.675"
 		);
 
-		tl.to({}, { duration: 1.2 });
+		// Mark the point where letter animation is fully complete
+		tl.addLabel("lettersEnd");
+
+		// --- Progress line: expands from center outward during the expand phase ---
+		const expandStartTime = tl.labels.expandStart;
+		const lettersEndTime = tl.labels.lettersEnd;
+		const lineDuration = lettersEndTime - expandStartTime;
+
+		tl.to(
+			lineRef.current,
+			{
+				scaleX: 1,
+				duration: lineDuration,
+				ease: "power1.inOut",
+			},
+			"expandStart"
+		);
+
+		// --- Phase 4: Pause after text completes, then split ---
+		tl.to({}, { duration: 0.72 });
 
 		tl.call(startFadeOut);
 
-		tl.to(overlayRef.current, {
+		// Fade the text out as the split begins
+		tl.to(textContainerRef.current, {
 			opacity: 0,
-			duration: 0.75,
-			ease: "power2.inOut",
+			duration: 0.27,
+			ease: "power2.in",
 		});
+
+		// Horizontal split: top panel slides up, bottom panel slides down
+		tl.to(
+			topPanelRef.current,
+			{
+				yPercent: -100,
+				duration: 0.765,
+				ease: "power3.inOut",
+			},
+			"-=0.135"
+		);
+
+		tl.to(
+			bottomPanelRef.current,
+			{
+				yPercent: 100,
+				duration: 0.765,
+				ease: "power3.inOut",
+			},
+			"<"
+		);
 
 		return () => {
 			tl.kill();
@@ -125,82 +182,127 @@ export default function IntroLoader({
 	return (
 		<>
 			{isLoading && (
-				<div
-					ref={overlayRef}
-					style={{
-						position: "fixed",
-						inset: 0,
-						zIndex: 50,
-						display: "flex",
-						alignItems: "center",
-						justifyContent: "center",
-						backgroundColor: "#000",
-					}}
-				>
+				<>
+					{/* Top half panel */}
 					<div
+						ref={topPanelRef}
 						style={{
+							position: "fixed",
+							top: 0,
+							left: 0,
+							width: "100%",
+							height: "50%",
+							zIndex: 50,
+							backgroundColor: "#000",
+						}}
+					/>
+					{/* Bottom half panel */}
+					<div
+						ref={bottomPanelRef}
+						style={{
+							position: "fixed",
+							bottom: 0,
+							left: 0,
+							width: "100%",
+							height: "50%",
+							zIndex: 50,
+							backgroundColor: "#000",
+						}}
+					/>
+					{/* Text + line layer centered on top of both panels */}
+					<div
+						ref={textContainerRef}
+						style={{
+							position: "fixed",
+							inset: 0,
+							zIndex: 51,
 							display: "flex",
-							flexDirection: "row",
-							fontSize: "clamp(2.5rem, 8vw, 5rem)",
-							fontWeight: 700,
-							fontFamily: "var(--font-jetbrains-mono), monospace",
-							letterSpacing: "-0.02em",
-							lineHeight: 1,
-							userSelect: "none",
+							alignItems: "center",
+							justifyContent: "center",
+							pointerEvents: "none",
 						}}
 					>
-						{LETTERS.map((letterDef, i) => (
-							<span
-								key={letterDef.key}
-								ref={(el) => {
-									lettersRef.current[i] = el;
-								}}
+						<div style={{ position: "relative" }}>
+							<div
 								style={{
-									position: "relative",
-									display: "inline-block",
-									color: letterDef.isShort ? undefined : "#000",
-									WebkitTextStroke: letterDef.isShort
-										? undefined
-										: "1px rgba(255, 255, 255, 0.8)",
+									display: "flex",
+									flexDirection: "row",
+									fontSize: "clamp(2.5rem, 8vw, 5rem)",
+									fontWeight: 700,
+									fontFamily: "var(--font-jetbrains-mono), monospace",
+									letterSpacing: "-0.02em",
+									lineHeight: 1,
+									userSelect: "none",
 								}}
 							>
-								{letterDef.isShort ? (
-									<>
-										<span
-											style={{
-												color: "#000",
-												WebkitTextStroke: "1px rgba(255, 255, 255, 0.8)",
-											}}
-										>
-											{letterDef.char}
-										</span>
-										<span
-											aria-hidden="true"
-											ref={(el) => {
-												whiteLayersRef.current[i] = el;
-											}}
-											style={{
-												position: "absolute",
-												inset: 0,
-												color: "#fff",
-												WebkitTextStroke: "1px rgba(255, 255, 255, 0.8)",
-												clipPath: "inset(100% 0 0 0)",
-											}}
-										>
-											{letterDef.char}
-										</span>
-									</>
-								) : (
-									letterDef.char
-								)}
-							</span>
-						))}
+								{LETTERS.map((letterDef, i) => (
+									<span
+										key={letterDef.key}
+										ref={(el) => {
+											lettersRef.current[i] = el;
+										}}
+										style={{
+											position: "relative",
+											display: "inline-block",
+											color: letterDef.isShort ? undefined : "#000",
+											WebkitTextStroke: letterDef.isShort
+												? undefined
+												: "1px rgba(255, 255, 255, 0.8)",
+										}}
+									>
+										{letterDef.isShort ? (
+											<>
+												<span
+													style={{
+														color: "#000",
+														WebkitTextStroke: "1px rgba(255, 255, 255, 0.8)",
+													}}
+												>
+													{letterDef.char}
+												</span>
+												<span
+													aria-hidden="true"
+													ref={(el) => {
+														whiteLayersRef.current[i] = el;
+													}}
+													style={{
+														position: "absolute",
+														inset: 0,
+														color: "#fff",
+														WebkitTextStroke: "1px rgba(255, 255, 255, 0.8)",
+														clipPath: "inset(100% 0 0 0)",
+													}}
+												>
+													{letterDef.char}
+												</span>
+											</>
+										) : (
+											letterDef.char
+										)}
+									</span>
+								))}
+							</div>
+							{/* Horizontal progress line through the vertical center of the text */}
+							<div
+								ref={lineRef}
+								style={{
+									position: "absolute",
+									left: "-10vw",
+									right: "-10vw",
+									top: "50%",
+									height: "2px",
+									backgroundColor: "rgba(255, 255, 255, 0.8)",
+									transformOrigin: "center center",
+									transform: "scaleX(0)",
+								}}
+							/>
+						</div>
 					</div>
-				</div>
+				</>
 			)}
 			<div
 				style={{
-					visibility: isLoading ? "hidden" : "visible",
+					visibility: isLoading && !isFadingOut ? "hidden" : "visible",
 					height: "100%",
 				}}
 			>

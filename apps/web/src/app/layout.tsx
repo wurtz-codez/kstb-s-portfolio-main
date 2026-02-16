@@ -50,8 +50,8 @@ const telma = localFont({
 });
 
 export const metadata: Metadata = {
-	title: "kstb-s-portfolio",
-	description: "kstb-s-portfolio",
+	title: "Koustubh Pande",
+	description: "This is who I am.",
 };
 
 export default function RootLayout({
