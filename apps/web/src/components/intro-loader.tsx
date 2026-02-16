@@ -3,8 +3,6 @@
 import gsap from "gsap";
 import { useEffect, useRef, useState } from "react";
 
-const SESSION_KEY = "intro-loader-shown";
-
 // Each letter in "koustubh" with a stable key and whether it's part of "kstb"
 const LETTERS = [
 	{ char: "k", key: "k-first", isShort: true },
@@ -29,14 +27,9 @@ export default function IntroLoader({
 	const whiteLayersRef = useRef<(HTMLSpanElement | null)[]>([]);
 	const timelineRef = useRef<gsap.core.Timeline | null>(null);
 
-	// Check sessionStorage on mount
+	// Start animation on mount
 	useEffect(() => {
-		const alreadyShown = sessionStorage.getItem(SESSION_KEY);
-		if (alreadyShown) {
-			setIsLoading(false);
-		} else {
-			setShouldAnimate(true);
-		}
+		setShouldAnimate(true);
 	}, []);
 
 	// Run the animation
@@ -47,7 +40,6 @@ export default function IntroLoader({
 
 		const tl = gsap.timeline({
 			onComplete: () => {
-				sessionStorage.setItem(SESSION_KEY, "true");
 				setIsLoading(false);
 			},
 		});
@@ -88,26 +80,26 @@ export default function IntroLoader({
 
 		// --- Phase 1: Water fill animation ---
 		// Small delay before starting
-		tl.to({}, { duration: 0.4 });
+		tl.to({}, { duration: 0.6 });
 
 		// Animate white layers from bottom to top (water fill)
 		tl.to(shortWhiteLayers, {
 			clipPath: "inset(0% 0 0 0)",
-			duration: 1.2,
-			stagger: 0.15,
+			duration: 1.8,
+			stagger: 0.225,
 			ease: "power2.inOut",
 		});
 
 		// --- Phase 2: Spread and reveal ---
 		// Brief pause after fill completes
-		tl.to({}, { duration: 0.35 });
+		tl.to({}, { duration: 0.525 });
 
 		// Expand hidden letters to make space
 		tl.to(hiddenLetters, {
 			width: "auto",
-			duration: 0.8,
+			duration: 1.2,
 			ease: "power3.inOut",
-			stagger: 0.06,
+			stagger: 0.09,
 		});
 
 		// Fade in the hidden letters (slightly overlapping with the width animation)
@@ -115,20 +107,20 @@ export default function IntroLoader({
 			hiddenLetters,
 			{
 				opacity: 1,
-				duration: 0.5,
-				stagger: 0.06,
+				duration: 0.75,
+				stagger: 0.09,
 				ease: "power2.out",
 			},
-			"-=0.5"
+			"-=0.75"
 		);
 
 		// --- Phase 3: Hold and exit ---
-		tl.to({}, { duration: 0.8 });
+		tl.to({}, { duration: 1.2 });
 
 		// Fade out the entire overlay
 		tl.to(overlayRef.current, {
 			opacity: 0,
-			duration: 0.5,
+			duration: 0.75,
 			ease: "power2.inOut",
 		});
 
@@ -178,13 +170,23 @@ export default function IntroLoader({
 								style={{
 									position: "relative",
 									display: "inline-block",
-									color: letterDef.isShort ? undefined : "#555",
+									color: letterDef.isShort ? undefined : "#000",
+									WebkitTextStroke: letterDef.isShort
+										? undefined
+										: "1px rgba(255, 255, 255, 0.8)",
 								}}
 							>
 								{letterDef.isShort ? (
 									<>
-										{/* Grey base layer */}
-										<span style={{ color: "#555" }}>{letterDef.char}</span>
+										{/* Black base layer with white outline */}
+										<span
+											style={{
+												color: "#000",
+												WebkitTextStroke: "1px rgba(255, 255, 255, 0.8)",
+											}}
+										>
+											{letterDef.char}
+										</span>
 										{/* White overlay layer with clip-path for water fill */}
 										<span
 											aria-hidden="true"
@@ -195,6 +197,7 @@ export default function IntroLoader({
 												position: "absolute",
 												inset: 0,
 												color: "#fff",
+												WebkitTextStroke: "1px rgba(255, 255, 255, 0.8)",
 												clipPath: "inset(100% 0 0 0)",
 											}}
 										>
