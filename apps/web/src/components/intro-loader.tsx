@@ -3,7 +3,8 @@
 import gsap from "gsap";
 import { useEffect, useRef, useState } from "react";
 
-// Each letter in "koustubh" with a stable key and whether it's part of "kstb"
+import { useLoader } from "@/contexts/loader-context";
+
 const LETTERS = [
 	{ char: "k", key: "k-first", isShort: true },
 	{ char: "o", key: "o-first", isShort: false },
@@ -20,19 +21,17 @@ export default function IntroLoader({
 }: {
 	children: React.ReactNode;
 }) {
-	const [isLoading, setIsLoading] = useState(true);
+	const { isLoading, startFadeOut, setLoaderComplete } = useLoader();
 	const [shouldAnimate, setShouldAnimate] = useState(false);
 	const overlayRef = useRef<HTMLDivElement>(null);
 	const lettersRef = useRef<(HTMLSpanElement | null)[]>([]);
 	const whiteLayersRef = useRef<(HTMLSpanElement | null)[]>([]);
 	const timelineRef = useRef<gsap.core.Timeline | null>(null);
 
-	// Start animation on mount
 	useEffect(() => {
 		setShouldAnimate(true);
 	}, []);
 
-	// Run the animation
 	useEffect(() => {
 		if (!shouldAnimate) {
 			return;
@@ -40,12 +39,11 @@ export default function IntroLoader({
 
 		const tl = gsap.timeline({
 			onComplete: () => {
-				setIsLoading(false);
+				setLoaderComplete();
 			},
 		});
 		timelineRef.current = tl;
 
-		// Collect references for each group
 		const hiddenLetters: HTMLSpanElement[] = [];
 		const shortWhiteLayers: HTMLSpanElement[] = [];
 
@@ -66,23 +64,18 @@ export default function IntroLoader({
 			}
 		}
 
-		// Initial state: hidden letters have no width and are invisible
 		gsap.set(hiddenLetters, {
 			width: 0,
 			opacity: 0,
 			overflow: "hidden",
 		});
 
-		// Initial state: white layers are clipped from top (showing nothing)
 		gsap.set(shortWhiteLayers, {
 			clipPath: "inset(100% 0 0 0)",
 		});
 
-		// --- Phase 1: Water fill animation ---
-		// Small delay before starting
 		tl.to({}, { duration: 0.6 });
 
-		// Animate white layers from bottom to top (water fill)
 		tl.to(shortWhiteLayers, {
 			clipPath: "inset(0% 0 0 0)",
 			duration: 1.8,
@@ -90,11 +83,8 @@ export default function IntroLoader({
 			ease: "power2.inOut",
 		});
 
-		// --- Phase 2: Spread and reveal ---
-		// Brief pause after fill completes
 		tl.to({}, { duration: 0.525 });
 
-		// Expand hidden letters to make space
 		tl.to(hiddenLetters, {
 			width: "auto",
 			duration: 1.2,
@@ -102,7 +92,6 @@ export default function IntroLoader({
 			stagger: 0.09,
 		});
 
-		// Fade in the hidden letters (slightly overlapping with the width animation)
 		tl.to(
 			hiddenLetters,
 			{
@@ -114,10 +103,10 @@ export default function IntroLoader({
 			"-=0.75"
 		);
 
-		// --- Phase 3: Hold and exit ---
 		tl.to({}, { duration: 1.2 });
 
-		// Fade out the entire overlay
+		tl.call(startFadeOut);
+
 		tl.to(overlayRef.current, {
 			opacity: 0,
 			duration: 0.75,
@@ -127,9 +116,8 @@ export default function IntroLoader({
 		return () => {
 			tl.kill();
 		};
-	}, [shouldAnimate]);
+	}, [shouldAnimate, startFadeOut, setLoaderComplete]);
 
-	// If loader was already shown, render children directly
 	if (!(isLoading || shouldAnimate)) {
 		return <>{children}</>;
 	}
@@ -178,7 +166,6 @@ export default function IntroLoader({
 							>
 								{letterDef.isShort ? (
 									<>
-										{/* Black base layer with white outline */}
 										<span
 											style={{
 												color: "#000",
@@ -187,7 +174,6 @@ export default function IntroLoader({
 										>
 											{letterDef.char}
 										</span>
-										{/* White overlay layer with clip-path for water fill */}
 										<span
 											aria-hidden="true"
 											ref={(el) => {
@@ -215,6 +201,7 @@ export default function IntroLoader({
 			<div
 				style={{
 					visibility: isLoading ? "hidden" : "visible",
+					height: "100%",
 				}}
 			>
 				{children}

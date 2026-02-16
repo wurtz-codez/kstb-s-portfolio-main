@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { Geist, Geist_Mono, JetBrains_Mono } from "next/font/google";
+import localFont from "next/font/local";
 
 import "../index.css";
 import Header from "@/components/header";
@@ -21,6 +22,33 @@ const jetbrainsMono = JetBrains_Mono({
 	subsets: ["latin"],
 });
 
+const telma = localFont({
+	src: [
+		{
+			path: "../../public/fonts/Telma-Variable.woff2",
+			weight: "300 900",
+			style: "normal",
+		},
+		{
+			path: "../../public/fonts/Telma-Variable.woff",
+			weight: "300 900",
+			style: "normal",
+		},
+		{
+			path: "../../public/fonts/Telma-Variable.woff2",
+			weight: "300 900",
+			style: "italic",
+		},
+		{
+			path: "../../public/fonts/Telma-Variable.woff",
+			weight: "300 900",
+			style: "italic",
+		},
+	],
+	variable: "--font-telma",
+	display: "swap",
+});
+
 export const metadata: Metadata = {
 	title: "kstb-s-portfolio",
 	description: "kstb-s-portfolio",
@@ -34,7 +62,7 @@ export default function RootLayout({
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<body
-				className={`${geistSans.variable} ${geistMono.variable} ${jetbrainsMono.variable} antialiased`}
+				className={`${geistSans.variable} ${geistMono.variable} ${jetbrainsMono.variable} ${telma.variable} antialiased`}
 			>
 				<Providers>
 					<div className="grid h-svh grid-rows-[auto_1fr]">
