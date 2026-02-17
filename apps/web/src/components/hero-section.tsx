@@ -4,6 +4,7 @@ import gsap from "gsap";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import BottomText from "@/components/bottom-text";
+import LiquidEther from "@/components/liquid-ether";
 import { useLoader } from "@/contexts/loader-context";
 
 /**
@@ -129,7 +130,7 @@ export default function HeroSection() {
 		gsap.to(paths, {
 			fill: "rgba(255, 255, 255, 1)",
 			stroke: "rgba(255, 255, 255, 1)",
-			duration: 0.4,
+			duration: 0.8,
 			ease: "power2.out",
 		});
 	}, [animationDone]);
@@ -142,7 +143,7 @@ export default function HeroSection() {
 		gsap.to(paths, {
 			fill: "rgba(255, 255, 255, 0)",
 			stroke: "rgba(255, 255, 255, 0.8)",
-			duration: 0.3,
+			duration: 0.5,
 			ease: "power2.in",
 		});
 	}, [animationDone]);
@@ -157,71 +158,93 @@ export default function HeroSection() {
 			style={{
 				position: "sticky",
 				top: 0,
-				zIndex: 1,
 				width: "100%",
 				height: "100svh",
-				display: "flex",
-				alignItems: "center",
-				justifyContent: "center",
 				opacity: 0,
 				pointerEvents: loaderComplete ? "auto" : "none",
 			}}
 		>
-			<div style={{ position: "relative" }}>
-				<span
-					style={{
-						position: "absolute",
-						bottom: "100%",
-						left: "-20%",
-						marginBottom: "0.25em",
-						fontFamily: "var(--font-telma)",
-						fontStyle: "italic",
-						fontSize: "clamp(1.25rem, 4vw, 2rem)",
-						color: "rgba(255, 255, 255, 0.8)",
-						whiteSpace: "nowrap",
-					}}
-				>
-					hey, i&apos;m
-				</span>
-				<div
-					aria-hidden="true"
-					onBlur={handleMouseLeave}
-					onFocus={handleMouseEnter}
-					onPointerEnter={handleMouseEnter}
-					onPointerLeave={handleMouseLeave}
-					role="presentation"
-					style={{
-						cursor: "default",
-						userSelect: "none",
-						width: "clamp(280px, 70vw, 600px)",
-					}}
-				>
-					<svg
-						aria-labelledby="hero-name-title"
-						role="img"
-						style={{ width: "100%", height: "auto", display: "block" }}
-						viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
-						xmlns="http://www.w3.org/2000/svg"
+			<LiquidEther
+				autoDemo
+				autoIntensity={2.2}
+				autoSpeed={0.5}
+				colors={["#ebf8ff", "#000000", "#676871"]}
+				cursorSize={100}
+				isBounce={false}
+				isViscous
+				iterationsPoisson={32}
+				iterationsViscous={32}
+				mouseForce={33}
+				resolution={0.5}
+				viscous={30}
+			/>
+			<div
+				style={{
+					position: "relative",
+					zIndex: 1,
+					width: "100%",
+					height: "100%",
+					display: "flex",
+					alignItems: "center",
+					justifyContent: "center",
+				}}
+			>
+				<div style={{ position: "relative" }}>
+					<span
+						style={{
+							position: "absolute",
+							bottom: "100%",
+							left: "-20%",
+							marginBottom: "0.25em",
+							fontFamily: "var(--font-telma)",
+							fontStyle: "italic",
+							fontSize: "clamp(1.25rem, 4vw, 2rem)",
+							color: "rgba(255, 255, 255, 0.8)",
+							whiteSpace: "nowrap",
+						}}
 					>
-						<title id="hero-name-title">koustubh</title>
-						{LETTER_PATHS.map((letter, i) => (
-							<path
-								d={letter.d}
-								fill="rgba(255, 255, 255, 0)"
-								key={letter.char + String(i)}
-								ref={(el) => {
-									pathRefs.current[i] = el;
-								}}
-								stroke="rgba(255, 255, 255, 0.8)"
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								strokeWidth="1.5"
-							/>
-						))}
-					</svg>
+						hey, i&apos;m
+					</span>
+					<div
+						aria-hidden="true"
+						onBlur={handleMouseLeave}
+						onFocus={handleMouseEnter}
+						onPointerEnter={handleMouseEnter}
+						onPointerLeave={handleMouseLeave}
+						role="presentation"
+						style={{
+							cursor: "default",
+							userSelect: "none",
+							width: "clamp(280px, 70vw, 600px)",
+						}}
+					>
+						<svg
+							aria-labelledby="hero-name-title"
+							role="img"
+							style={{ width: "100%", height: "auto", display: "block" }}
+							viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
+							xmlns="http://www.w3.org/2000/svg"
+						>
+							<title id="hero-name-title">koustubh</title>
+							{LETTER_PATHS.map((letter, i) => (
+								<path
+									d={letter.d}
+									fill="rgba(255, 255, 255, 0)"
+									key={letter.char + String(i)}
+									ref={(el) => {
+										pathRefs.current[i] = el;
+									}}
+									stroke="rgba(255, 255, 255, 0.8)"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									strokeWidth="1.5"
+								/>
+							))}
+						</svg>
+					</div>
 				</div>
+				<BottomText />
 			</div>
-			<BottomText />
 		</div>
 	);
 }

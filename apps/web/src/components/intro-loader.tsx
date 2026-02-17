@@ -27,7 +27,6 @@ export default function IntroLoader({
 	const topPanelRef = useRef<HTMLDivElement>(null);
 	const bottomPanelRef = useRef<HTMLDivElement>(null);
 	const textContainerRef = useRef<HTMLDivElement>(null);
-	const lineRef = useRef<HTMLDivElement>(null);
 	const lettersRef = useRef<(HTMLSpanElement | null)[]>([]);
 	const whiteLayersRef = useRef<(HTMLSpanElement | null)[]>([]);
 	const timelineRef = useRef<gsap.core.Timeline | null>(null);
@@ -78,12 +77,6 @@ export default function IntroLoader({
 			clipPath: "inset(100% 0 0 0)",
 		});
 
-		// Initialize progress line at zero scale, expanding from center
-		gsap.set(lineRef.current, {
-			scaleX: 0,
-			transformOrigin: "center center",
-		});
-
 		// --- Phase 1: Initial pause ---
 		tl.to({}, { duration: 0.54 });
 
@@ -121,21 +114,6 @@ export default function IntroLoader({
 
 		// Mark the point where letter animation is fully complete
 		tl.addLabel("lettersEnd");
-
-		// --- Progress line: expands from center outward during the expand phase ---
-		const expandStartTime = tl.labels.expandStart;
-		const lettersEndTime = tl.labels.lettersEnd;
-		const lineDuration = lettersEndTime - expandStartTime;
-
-		tl.to(
-			lineRef.current,
-			{
-				scaleX: 1,
-				duration: lineDuration,
-				ease: "power1.inOut",
-			},
-			"expandStart"
-		);
 
 		// --- Phase 4: Pause after text completes, then split ---
 		tl.to({}, { duration: 0.72 });
@@ -282,20 +260,6 @@ export default function IntroLoader({
 									</span>
 								))}
 							</div>
-							{/* Horizontal progress line through the vertical center of the text */}
-							<div
-								ref={lineRef}
-								style={{
-									position: "absolute",
-									left: "-10vw",
-									right: "-10vw",
-									top: "50%",
-									height: "2px",
-									backgroundColor: "rgba(255, 255, 255, 0.8)",
-									transformOrigin: "center center",
-									transform: "scaleX(0)",
-								}}
-							/>
 						</div>
 					</div>
 				</>
