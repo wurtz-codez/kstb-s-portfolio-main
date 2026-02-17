@@ -1,35 +1,20 @@
 "use client";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 
-import { ModeToggle } from "./mode-toggle";
+import PillNav from "./pill-nav";
+
+const NAV_ITEMS = [{ label: "Works", href: "#works" }];
 
 export default function Header() {
-	const pathname = usePathname();
-	const isHome = pathname === "/";
-	const links = [{ to: "/", label: "Home" }] as const;
-
-	if (isHome) {
-		return null;
-	}
-
 	return (
-		<div>
-			<div className="flex flex-row items-center justify-between px-2 py-1">
-				<nav className="flex gap-4 text-lg">
-					{links.map(({ to, label }) => {
-						return (
-							<Link href={to} key={to}>
-								{label}
-							</Link>
-						);
-					})}
-				</nav>
-				<div className="flex items-center gap-2">
-					<ModeToggle />
-				</div>
-			</div>
-			<hr />
-		</div>
+		<PillNav
+			baseColor="#000000"
+			className="site-nav"
+			ease="power2.easeOut"
+			hoveredPillTextColor="#ffffff"
+			initialLoadAnimation={false}
+			items={NAV_ITEMS}
+			pillColor="#ffffff"
+			pillTextColor="#000000"
+		/>
 	);
 }

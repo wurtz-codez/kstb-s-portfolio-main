@@ -3,12 +3,7 @@
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useEffect, useRef } from "react";
-import {
-	type NotePosition,
-	type Project,
-	STICKY_NOTE_STYLES,
-	StickyNote,
-} from "@/components/sticky-note";
+import { type Project, TiltedCard } from "@/components/tilted-card";
 import { useLoader } from "@/contexts/loader-context";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -24,6 +19,7 @@ const PROJECTS: Project[] = [
 		category: "work",
 		tags: ["React", "TypeScript", "Node.js"],
 		live: "#",
+		gradient: "linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)",
 	},
 	{
 		title: "Project Two",
@@ -32,6 +28,7 @@ const PROJECTS: Project[] = [
 		tags: ["Next.js", "PostgreSQL"],
 		github: "#",
 		live: "#",
+		gradient: "linear-gradient(135deg, #2d1b33 0%, #1a1a2e 50%, #0d1117 100%)",
 	},
 	{
 		title: "Project Three",
@@ -39,6 +36,7 @@ const PROJECTS: Project[] = [
 		category: "work",
 		tags: ["Swift", "iOS"],
 		github: "#",
+		gradient: "linear-gradient(135deg, #1b2838 0%, #171a21 50%, #1e2d3d 100%)",
 	},
 	{
 		title: "Project Four",
@@ -47,6 +45,7 @@ const PROJECTS: Project[] = [
 		tags: ["Python", "ML"],
 		github: "#",
 		live: "#",
+		gradient: "linear-gradient(135deg, #1a1a1a 0%, #2a1a2a 50%, #1a2a2a 100%)",
 	},
 	{
 		title: "Project Five",
@@ -54,28 +53,33 @@ const PROJECTS: Project[] = [
 		category: "project",
 		tags: ["Rust", "CLI"],
 		github: "#",
+		gradient: "linear-gradient(135deg, #0d1117 0%, #161b22 50%, #1a1a2e 100%)",
 	},
 ];
 
 // ---------------------------------------------------------------------------
-// Layout: positions and rotations for the 5 sticky notes
+// Layout: positions and rotations for the 5 cards
 // ---------------------------------------------------------------------------
 
-const NOTE_POSITIONS: NotePosition[] = [
-	// top-left
+interface CardPosition {
+	top?: string;
+	bottom?: string;
+	left?: string;
+	right?: string;
+	rotation: number;
+	transformExtra?: string;
+}
+
+const CARD_POSITIONS: CardPosition[] = [
 	{ top: "6%", left: "10%", rotation: -2.5 },
-	// top-right
 	{ top: "4%", right: "10%", rotation: 1.8 },
-	// center
 	{
 		top: "50%",
 		left: "50%",
 		rotation: 0.5,
 		transformExtra: "translate(-50%, -50%)",
 	},
-	// bottom-left
 	{ bottom: "6%", left: "8%", rotation: 2.2 },
-	// bottom-right
 	{ bottom: "4%", right: "10%", rotation: -1.5 },
 ];
 
@@ -86,14 +90,47 @@ const NOTE_POSITIONS: NotePosition[] = [
 const FONT_MONO = "var(--font-jetbrains-mono), monospace";
 const FONT_ACCENT = "var(--font-telma)";
 const COLOR_DIVIDER = "rgba(255, 255, 255, 0.1)";
+const CARD_SIZE = "clamp(234px, 23.4vw, 364px)";
+
+// ---------------------------------------------------------------------------
+// Responsive styles for the card layout
+// ---------------------------------------------------------------------------
+
+const RESPONSIVE_STYLES = `
+	@media (max-width: 768px) {
+		.works-cards-container {
+			display: flex !important;
+			flex-direction: column !important;
+			align-items: center !important;
+			gap: 2rem !important;
+			height: auto !important;
+			min-height: auto !important;
+			padding: 2rem 0 !important;
+		}
+		.works-card-wrapper {
+			position: relative !important;
+			top: auto !important;
+			bottom: auto !important;
+			left: auto !important;
+			right: auto !important;
+			transform: none !important;
+			width: min(338px, 97.5vw) !important;
+			height: min(338px, 97.5vw) !important;
+		}
+	}
+
+	@media (min-width: 769px) and (max-width: 1100px) {
+		.works-card-wrapper {
+			width: clamp(208px, 26vw, 286px) !important;
+			height: clamp(208px, 26vw, 286px) !important;
+		}
+	}
+`;
 
 // ---------------------------------------------------------------------------
 // Section-level GSAP helpers
 // ---------------------------------------------------------------------------
 
-/**
- * Animate the section header elements with ScrollTrigger.
- */
 const animateSectionHeader = (
 	labelEl: HTMLElement | null,
 	headingEl: HTMLElement | null,
@@ -154,9 +191,6 @@ const animateSectionHeader = (
 	}
 };
 
-/**
- * Animate the section reveal container with a circular clip-path.
- */
 const animateSectionReveal = (
 	revealEl: HTMLDivElement | null,
 	triggerEl: HTMLElement | null
@@ -181,17 +215,14 @@ const animateSectionReveal = (
 	);
 };
 
-/**
- * Stagger-reveal the sticky notes after the section enters.
- */
-const animateNotes = (notes: (HTMLDivElement | null)[]): void => {
-	const validNotes = notes.filter(Boolean);
-	if (validNotes.length === 0) {
+const animateCards = (cards: (HTMLElement | null)[]): void => {
+	const validCards = cards.filter(Boolean);
+	if (validCards.length === 0) {
 		return;
 	}
 
 	gsap.fromTo(
-		validNotes,
+		validCards,
 		{ opacity: 0, scale: 0.82, y: 30 },
 		{
 			opacity: 1,
@@ -201,7 +232,7 @@ const animateNotes = (notes: (HTMLDivElement | null)[]): void => {
 			ease: "back.out(1.4)",
 			stagger: 0.13,
 			scrollTrigger: {
-				trigger: validNotes[0],
+				trigger: validCards[0],
 				start: "top 90%",
 				toggleActions: "play none none none",
 			},
@@ -222,7 +253,7 @@ export default function WorksSection() {
 	const headingRef = useRef<HTMLHeadingElement>(null);
 	const lineRef = useRef<HTMLDivElement>(null);
 
-	const noteRefs = useRef<(HTMLDivElement | null)[]>([]);
+	const cardRefs = useRef<(HTMLElement | null)[]>([]);
 
 	useEffect(() => {
 		if (!loaderComplete) {
@@ -236,7 +267,7 @@ export default function WorksSection() {
 				headingRef.current,
 				lineRef.current
 			);
-			animateNotes(noteRefs.current);
+			animateCards(cardRefs.current);
 		}, sectionRef);
 
 		return () => {
@@ -246,6 +277,7 @@ export default function WorksSection() {
 
 	return (
 		<section
+			id="works"
 			ref={sectionRef}
 			style={{
 				position: "relative",
@@ -254,7 +286,7 @@ export default function WorksSection() {
 				zIndex: 10,
 			}}
 		>
-			<style>{STICKY_NOTE_STYLES}</style>
+			<style>{RESPONSIVE_STYLES}</style>
 
 			<div
 				ref={revealRef}
@@ -313,26 +345,44 @@ export default function WorksSection() {
 					}}
 				/>
 
-				{/* Sticky notes container */}
+				{/* Cards container */}
 				<div
-					className="sticky-notes-container"
+					className="works-cards-container"
 					style={{
 						position: "relative",
 						width: "100%",
-						minHeight: "max(70vh, 520px)",
-						height: "clamp(520px, 75vh, 800px)",
+						minHeight: "max(80vh, 676px)",
+						height: "clamp(676px, 97.5vh, 1040px)",
 					}}
 				>
-					{PROJECTS.map((project, i) => (
-						<StickyNote
-							key={project.title}
-							noteRef={(el) => {
-								noteRefs.current[i] = el;
-							}}
-							position={NOTE_POSITIONS[i]}
-							project={project}
-						/>
-					))}
+					{PROJECTS.map((project, i) => {
+						const pos = CARD_POSITIONS[i];
+						const baseRotation = `rotate(${pos.rotation}deg)`;
+						const extra = pos.transformExtra ? ` ${pos.transformExtra}` : "";
+
+						return (
+							<div
+								className="works-card-wrapper"
+								key={project.title}
+								ref={(el) => {
+									cardRefs.current[i] = el;
+								}}
+								style={{
+									position: "absolute",
+									width: CARD_SIZE,
+									height: CARD_SIZE,
+									...(pos.top !== undefined ? { top: pos.top } : {}),
+									...(pos.bottom !== undefined ? { bottom: pos.bottom } : {}),
+									...(pos.left !== undefined ? { left: pos.left } : {}),
+									...(pos.right !== undefined ? { right: pos.right } : {}),
+									transform: `${baseRotation}${extra}`,
+									opacity: 0,
+								}}
+							>
+								<TiltedCard project={project} showTooltip={false} size="100%" />
+							</div>
+						);
+					})}
 				</div>
 			</div>
 		</section>

@@ -6,7 +6,7 @@ import { useLoader } from "@/contexts/loader-context";
 
 const POINTS = [
 	"Full-Stack Product Builder",
-	"Ai-Driven System Design",
+	"AI-Driven System Designer",
 	"Co-Founder of Singularity Works",
 	"iOS Developer",
 ] as const;
