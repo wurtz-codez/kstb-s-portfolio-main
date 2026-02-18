@@ -204,12 +204,12 @@ const animateSectionReveal = (
 		{ clipPath: "circle(0% at 50% 100%)" },
 		{
 			clipPath: "circle(150% at 50% 100%)",
-			ease: "none",
+			ease: "power1.out",
 			scrollTrigger: {
 				trigger: triggerEl,
 				start: "top bottom",
-				end: "top top",
-				scrub: 0.6,
+				end: "bottom top",
+				scrub: 0.8,
 			},
 		}
 	);
