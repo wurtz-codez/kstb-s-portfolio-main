@@ -214,7 +214,7 @@ interface LiquidEtherProps {
 // ── Component ──
 
 export default function LiquidEther({
-	mouseForce = 33,
+	mouseForce = 20,
 	cursorSize = 100,
 	isViscous = true,
 	viscous = 30,
@@ -224,13 +224,13 @@ export default function LiquidEther({
 	BFECC = true,
 	resolution = 0.5,
 	isBounce = false,
-	colors = ["#ebf8ff", "#000000", "#676871"],
 	autoDemo = true,
 	autoSpeed = 0.5,
 	autoIntensity = 2.2,
 	takeoverDuration = 0.25,
-	autoResumeDelay = 1000,
+	autoResumeDelay = 2000,
 	autoRampDuration = 0.6,
+	colors = ["#ebf8ff", "#000000", "#676871"],
 }: LiquidEtherProps) {
 	const mountRef = useRef<HTMLDivElement>(null);
 
@@ -325,10 +325,11 @@ export default function LiquidEther({
 			const renderer = new THREE.WebGLRenderer({
 				antialias: true,
 				alpha: true,
+				powerPreference: "high-performance",
 			});
 			renderer.autoClear = false;
 			renderer.setClearColor(new THREE.Color(0x00_00_00), 0);
-			renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+			renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
 			renderer.setSize(commonWidth, commonHeight);
 			renderer.domElement.style.width = "100%";
 			renderer.domElement.style.height = "100%";

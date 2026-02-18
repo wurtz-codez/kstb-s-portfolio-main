@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useMotionValue, useSpring } from "motion/react";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -69,7 +69,7 @@ export function TiltedCard({
 	const tooltipOpacity = useSpring(0);
 	const captionRotate = useSpring(0, CAPTION_SPRING);
 
-	const [lastY, setLastY] = useState(0);
+	const lastYRef = useRef(0);
 
 	function handlePointerMove(e: React.PointerEvent) {
 		const el = ref.current;
@@ -87,9 +87,9 @@ export function TiltedCard({
 		cursorX.set(e.clientX - rect.left);
 		cursorY.set(e.clientY - rect.top);
 
-		const velocityY = offsetY - lastY;
+		const velocityY = offsetY - lastYRef.current;
 		captionRotate.set(-velocityY * 0.6);
-		setLastY(offsetY);
+		lastYRef.current = offsetY;
 	}
 
 	function handlePointerEnter() {

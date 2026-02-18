@@ -91,6 +91,8 @@ const FONT_MONO = "var(--font-jetbrains-mono), monospace";
 const FONT_ACCENT = "var(--font-telma)";
 const COLOR_DIVIDER = "rgba(255, 255, 255, 0.1)";
 const CARD_SIZE = "clamp(234px, 23.4vw, 364px)";
+const CHROME_REGEX = /Chrome\/|Chromium\//;
+const EDGE_REGEX = /Edg\//;
 
 // ---------------------------------------------------------------------------
 // Responsive styles for the card layout
@@ -199,6 +201,11 @@ const animateSectionReveal = (
 		return;
 	}
 
+	const isChrome =
+		typeof navigator !== "undefined" &&
+		CHROME_REGEX.test(navigator.userAgent) &&
+		!EDGE_REGEX.test(navigator.userAgent);
+
 	gsap.fromTo(
 		revealEl,
 		{ clipPath: "circle(0% at 50% 100%)" },
@@ -209,7 +216,7 @@ const animateSectionReveal = (
 				trigger: triggerEl,
 				start: "top bottom",
 				end: "bottom top",
-				scrub: 0.8,
+				scrub: isChrome ? 0.5 : 0.8,
 			},
 		}
 	);
