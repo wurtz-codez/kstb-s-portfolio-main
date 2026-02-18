@@ -4,8 +4,6 @@ import { useEffect, useRef } from "react";
 // biome-ignore lint/performance/noNamespaceImport: THREE.js is conventionally used as a namespace import
 import * as THREE from "three";
 
-import "./liquid-ether.css";
-
 // ── GLSL Shaders ──
 
 const FACE_VERT = `

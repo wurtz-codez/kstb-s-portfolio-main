@@ -126,3 +126,85 @@
 		@apply font-sans;
 	}
 }
+
+@layer components {
+	.pill {
+		@apply inline-flex items-center justify-center h-full px-[18px] rounded-full box-border font-semibold text-sm uppercase tracking-wider whitespace-nowrap cursor-pointer relative overflow-hidden;
+		background: var(--pill-bg, #fff);
+		color: var(--pill-text, var(--base, #000));
+		font-family: var(--font-jetbrains-mono), monospace;
+	}
+
+	.pill-logo {
+		@apply w-[42px] h-[42px] rounded-full flex items-center justify-center overflow-hidden no-underline border-none cursor-pointer p-1;
+		background: var(--base, #000);
+	}
+
+	.pill-logo img {
+		@apply w-full h-full object-contain block rounded-full;
+	}
+
+	.pill .hover-circle {
+		@apply absolute left-1/2 bottom-0 rounded-full pointer-events-none;
+		background: var(--base, #000);
+		will-change: transform;
+	}
+
+	.pill .label-stack {
+		@apply relative inline-block leading-none z-10;
+	}
+
+	.pill .pill-label {
+		@apply relative z-20 inline-block leading-none;
+		will-change: transform;
+	}
+
+	.pill .pill-label-hover {
+		@apply absolute left-0 top-0 inline-block z-30;
+		color: var(--hover-text, #fff);
+		will-change: transform, opacity;
+	}
+
+	.pill.is-active::after {
+		content: "";
+		@apply absolute -bottom-1.5 left-1/2 -translate-x-1/2 rounded-[50px] z-40;
+		width: 12px;
+		height: 12px;
+		background: var(--base, #000);
+	}
+
+	.mobile-menu-button {
+		@apply w-[42px] h-[42px] rounded-full flex flex-col items-center justify-center gap-1 cursor-pointer p-0 relative;
+		background: var(--base, #000);
+	}
+
+	.hamburger-line {
+		@apply w-4 h-0.5 rounded-sm origin-center;
+		background: var(--pill-bg, #fff);
+		transition: all 0.01s ease;
+	}
+
+	.mobile-menu-popover {
+		@apply fixed top-[calc(1em+3em)] left-4 right-4 rounded-[27px] shadow-[0_8px_32px_rgba(0,0,0,0.12)] z-[998] opacity-0 [transform-origin:top_center];
+		background: var(--base, #f0f0f0);
+		visibility: hidden;
+	}
+
+	.mobile-menu-link {
+		@apply block px-4 py-3 no-underline text-base font-medium rounded-full cursor-pointer transition-all duration-200;
+		background-color: var(--pill-bg, #fff);
+		color: var(--pill-text, #fff);
+		font-family: var(--font-jetbrains-mono), monospace;
+	}
+
+	.mobile-menu-link:hover {
+		background-color: var(--base);
+		color: var(--hover-text, #fff);
+	}
+
+	.liquid-ether-el {
+		@apply absolute inset-0 overflow-hidden;
+		touch-action: none;
+		z-index: 0;
+	}
+}

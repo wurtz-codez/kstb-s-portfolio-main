@@ -2,7 +2,6 @@
 
 import { motion, useMotionValue, useSpring } from "motion/react";
 import { useRef, useState } from "react";
-import "./tilted-card.css";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -121,7 +120,7 @@ export function TiltedCard({
 
 	return (
 		<div
-			className="tilted-card-figure"
+			className="group tilted-card-figure perspective-[800px] relative flex flex-col items-center justify-center"
 			onPointerEnter={handlePointerEnter}
 			onPointerLeave={handlePointerLeave}
 			onPointerMove={handlePointerMove}
@@ -135,7 +134,7 @@ export function TiltedCard({
 			}}
 		>
 			<motion.div
-				className="tilted-card-inner"
+				className="tilted-card-inner preserve-3d relative overflow-hidden rounded-lg"
 				style={{
 					width: size,
 					height: size,
@@ -145,9 +144,12 @@ export function TiltedCard({
 				}}
 			>
 				{/* Gradient placeholder (or background-image when real image exists) */}
-				<div className="tilted-card-gradient" style={backgroundStyle}>
+				<div
+					className="tilted-card-gradient translate-z-0 absolute inset-0 flex items-end justify-start rounded-lg p-4 transition-transform duration-[450ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] group-hover:translate-x-[-35%]"
+					style={backgroundStyle}
+				>
 					<span
-						className="tilted-card-gradient-title"
+						className="tilted-card-gradient-title font-semibold text-[clamp(0.75rem,1.2vw,0.95rem)] text-white/90 leading-tight tracking-tight"
 						style={{ fontFamily: FONT_MONO }}
 					>
 						{project.title}
@@ -161,7 +163,7 @@ export function TiltedCard({
 			{/* Cursor-following tooltip */}
 			{showTooltip && (
 				<motion.div
-					className="tilted-card-caption"
+					className="tilted-card-caption pointer-events-none absolute top-0 left-0 z-30 rounded bg-white px-2.5 py-1 text-[10px] text-neutral-800 opacity-0"
 					style={{
 						x: cursorX,
 						y: cursorY,
@@ -183,31 +185,41 @@ export function TiltedCard({
 
 function InfoPanel({ project }: { project: Project }) {
 	return (
-		<div className="tilted-card-info-panel" style={{ fontFamily: FONT_MONO }}>
+		<div
+			className="tilted-card-info-panel pointer-events-none absolute top-0 right-0 z-40 flex h-full w-[60%] translate-x-full flex-col justify-between rounded-r-lg bg-white p-[clamp(0.6rem,1.5vw,1rem)] opacity-0 transition-all duration-[450ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] group-hover:pointer-events-auto group-hover:translate-x-0 group-hover:opacity-100"
+			style={{ fontFamily: FONT_MONO }}
+		>
 			<div>
 				<span
-					className="tilted-card-info-category"
+					className="tilted-card-info-category mb-0.5 block text-[0.5rem] text-black/35 uppercase italic tracking-widest"
 					style={{ fontFamily: FONT_ACCENT }}
 				>
 					{project.category}
 				</span>
-				<h3 className="tilted-card-info-title">{project.title}</h3>
-				<p className="tilted-card-info-description">{project.description}</p>
+				<h3 className="tilted-card-info-title mb-0.5 font-bold text-[clamp(0.65rem,1.1vw,0.85rem)] text-black leading-tight tracking-tight">
+					{project.title}
+				</h3>
+				<p className="tilted-card-info-description m-0 text-[clamp(0.48rem,0.8vw,0.6rem)] text-black/55 leading-relaxed">
+					{project.description}
+				</p>
 			</div>
 
 			<div>
-				<div className="tilted-card-info-tags">
+				<div className="tilted-card-info-tags mb-1 flex flex-wrap gap-0.5">
 					{project.tags.map((tag) => (
-						<span className="tilted-card-info-tag" key={tag}>
+						<span
+							className="tilted-card-info-tag border border-black/12 px-0.5 py-0.5 text-[0.42rem] text-black/40 tracking-wide"
+							key={tag}
+						>
 							{tag}
 						</span>
 					))}
 				</div>
 
-				<div className="tilted-card-info-links">
+				<div className="tilted-card-info-links flex items-center gap-2">
 					{project.github && (
 						<a
-							className="tilted-card-info-link"
+							className="tilted-card-info-link font-medium text-[0.52rem] text-black/60 underline decoration-black/20 underline-offset-2 transition-all duration-200 hover:translate-x-0.5 hover:text-black/85"
 							href={project.github}
 							rel="noopener noreferrer"
 							target="_blank"
@@ -217,7 +229,7 @@ function InfoPanel({ project }: { project: Project }) {
 					)}
 					{project.live && (
 						<a
-							className="tilted-card-info-link"
+							className="tilted-card-info-link font-medium text-[0.52rem] text-black/60 underline decoration-black/20 underline-offset-2 transition-all duration-200 hover:translate-x-0.5 hover:text-black/85"
 							href={project.live}
 							rel="noopener noreferrer"
 							target="_blank"

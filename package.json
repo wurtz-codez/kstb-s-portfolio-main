@@ -26,7 +26,6 @@
   "dependencies": {
     "@kstb-s-portfolio/env": "workspace:*",
     "dotenv": "catalog:",
-    "lenis": "^1.3.17",
     "zod": "catalog:"
   },
   "devDependencies": {

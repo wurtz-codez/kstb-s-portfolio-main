@@ -8,7 +8,7 @@ const POINTS = [
 	"Full-Stack Product Builder",
 	"AI-Driven System Designer",
 	"Co-Founder of Singularity Works",
-	"iOS Developer",
+	"iOS Application Developer",
 ] as const;
 
 export default function BottomText() {

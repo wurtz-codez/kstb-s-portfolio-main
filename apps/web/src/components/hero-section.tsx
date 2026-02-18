@@ -190,7 +190,7 @@ export default function HeroSection() {
 				}}
 			>
 				<div style={{ position: "relative" }}>
-					<span
+					{/* <span
 						style={{
 							position: "absolute",
 							bottom: "100%",
@@ -204,7 +204,7 @@ export default function HeroSection() {
 						}}
 					>
 						hey, i&apos;m
-					</span>
+					</span> */}
 					<div
 						aria-hidden="true"
 						onBlur={handleMouseLeave}

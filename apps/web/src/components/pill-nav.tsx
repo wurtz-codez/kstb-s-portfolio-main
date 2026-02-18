@@ -5,8 +5,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import "./pill-nav.css";
-
 interface NavItem {
 	label: string;
 	href: string;
@@ -293,34 +291,24 @@ export default function PillNav({
 	} as React.CSSProperties;
 
 	return (
-		<div className="pill-nav-container">
+		<div
+			className={`fixed top-4 left-1/2 z-[99] -translate-x-1/2 max-md:left-0 max-md:w-full max-md:translate-x-0 ${className}`}
+		>
 			<nav
 				aria-label="Primary"
-				className={`pill-nav ${className}`}
+				className="flex w-max items-center max-md:w-full max-md:justify-between max-md:px-4"
 				style={cssVars}
 			>
-				<button
-					aria-label="Scroll to top"
-					className="pill-logo"
-					onClick={handleScrollToTop}
-					onMouseEnter={handleLogoEnter}
-					ref={logoRef}
-					type="button"
+				<div
+					className="relative flex h-[42px] items-center rounded-full bg-white max-md:hidden dark:bg-black"
+					ref={navItemsRef}
 				>
-					<span ref={logoSvgRef} style={{ display: "inline-flex" }}>
-						<Image
-							alt="Koustubh Pande"
-							height={LOGO_SIZE}
-							src="/title-logo.png"
-							width={LOGO_SIZE}
-						/>
-					</span>
-				</button>
-
-				<div className="pill-nav-items desktop-only" ref={navItemsRef}>
-					<ul className="pill-list">
+					<ul
+						className="m-0 flex h-full list-none items-stretch gap-[3px] p-[3px]"
+						style={{ fontFamily: "var(--font-jetbrains-mono), monospace" }}
+					>
 						{items.map((item, i) => (
-							<li key={item.href}>
+							<li className="flex h-full" key={item.href}>
 								{isAnchorLink(item.href) ? (
 									<a
 										aria-label={item.label}
@@ -376,10 +364,30 @@ export default function PillNav({
 				</div>
 
 				<button
+					aria-label="Scroll to top"
+					className="pill-logo"
+					onClick={handleScrollToTop}
+					onMouseEnter={handleLogoEnter}
+					ref={logoRef}
+					style={cssVars}
+					type="button"
+				>
+					<span className="inline-flex" ref={logoSvgRef}>
+						<Image
+							alt="Koustubh Pande"
+							height={LOGO_SIZE}
+							src="/title-logo.png"
+							width={LOGO_SIZE}
+						/>
+					</span>
+				</button>
+
+				<button
 					aria-label="Toggle menu"
-					className="mobile-menu-button mobile-only"
+					className="mobile-menu-button hidden max-md:flex"
 					onClick={toggleMobileMenu}
 					ref={hamburgerRef}
+					style={cssVars}
 					type="button"
 				>
 					<span className="hamburger-line" />
@@ -388,11 +396,11 @@ export default function PillNav({
 			</nav>
 
 			<div
-				className="mobile-menu-popover mobile-only"
+				className="mobile-menu-popover md:hidden"
 				ref={mobileMenuRef}
 				style={cssVars}
 			>
-				<ul className="mobile-menu-list">
+				<ul className="m-0 flex list-none flex-col gap-[3px] p-[3px]">
 					{items.map((item) => (
 						<li key={item.href}>
 							{isAnchorLink(item.href) ? (
