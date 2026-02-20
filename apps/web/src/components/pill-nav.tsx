@@ -43,7 +43,7 @@ export default function PillNav({
 	const logoTweenRef = useRef<gsap.core.Tween | null>(null);
 	const hamburgerRef = useRef<HTMLButtonElement>(null);
 	const mobileMenuRef = useRef<HTMLDivElement>(null);
-	const navItemsRef = useRef<HTMLDivElement>(null);
+	const navItemsRefs = useRef<(HTMLDivElement | null)[]>([]);
 	const easeRef = useRef(ease);
 	const initialLoadAnimationRef = useRef(initialLoadAnimation);
 
@@ -151,7 +151,7 @@ export default function PillNav({
 
 		if (initialLoadAnimationRef.current) {
 			const logoEl = logoRef.current;
-			const navItems = navItemsRef.current;
+			const navGroups = navItemsRefs.current.filter(Boolean);
 
 			if (logoEl) {
 				gsap.set(logoEl, { scale: 0 });
@@ -162,9 +162,9 @@ export default function PillNav({
 				});
 			}
 
-			if (navItems) {
-				gsap.set(navItems, { width: 0, overflow: "hidden" });
-				gsap.to(navItems, {
+			if (navGroups.length > 0) {
+				gsap.set(navGroups, { width: 0, overflow: "hidden" });
+				gsap.to(navGroups, {
 					width: "auto",
 					duration: 0.6,
 					ease: currentEase,
@@ -290,82 +290,93 @@ export default function PillNav({
 		"--pill-text": resolvedPillTextColor,
 	} as React.CSSProperties;
 
+	const half = Math.ceil(items.length / 2);
+	const leftItems = items.slice(0, half);
+	const rightItems = items.slice(half);
+
 	return (
 		<div
 			className={`fixed top-4 left-1/2 z-[99] -translate-x-1/2 max-md:left-0 max-md:w-full max-md:translate-x-0 ${className}`}
 		>
 			<nav
 				aria-label="Primary"
-				className="flex w-max items-center max-md:w-full max-md:justify-between max-md:px-4"
+				className="flex w-max items-center gap-2 max-md:w-full max-md:justify-between max-md:px-4"
 				style={cssVars}
 			>
-				<div
-					className="relative flex h-[42px] items-center rounded-full bg-white max-md:hidden dark:bg-black"
-					ref={navItemsRef}
-				>
-					<ul
-						className="m-0 flex h-full list-none items-stretch gap-[3px] p-[3px]"
-						style={{ fontFamily: "var(--font-jetbrains-mono), monospace" }}
+				{leftItems.length > 0 && (
+					<div
+						className="nav-pill-group relative flex h-[42px] items-center rounded-full bg-white max-md:hidden dark:bg-black"
+						ref={(el) => {
+							navItemsRefs.current[0] = el;
+						}}
 					>
-						{items.map((item, i) => (
-							<li className="flex h-full" key={item.href}>
-								{isAnchorLink(item.href) ? (
-									<a
-										aria-label={item.label}
-										className="pill"
-										href={item.href}
-										onClick={(e) => {
-											e.preventDefault();
-											handleScrollTo(item.href);
-										}}
-										onMouseEnter={() => handleEnter(i)}
-										onMouseLeave={() => handleLeave(i)}
-									>
-										<span
-											aria-hidden="true"
-											className="hover-circle"
-											ref={(el) => {
-												circleRefs.current[i] = el;
-											}}
-										/>
-										<span className="label-stack">
-											<span className="pill-label">{item.label}</span>
-											<span aria-hidden="true" className="pill-label-hover">
-												{item.label}
-											</span>
-										</span>
-									</a>
-								) : (
-									<Link
-										aria-label={item.label}
-										className="pill"
-										href={item.href as never}
-										onMouseEnter={() => handleEnter(i)}
-										onMouseLeave={() => handleLeave(i)}
-									>
-										<span
-											aria-hidden="true"
-											className="hover-circle"
-											ref={(el) => {
-												circleRefs.current[i] = el;
-											}}
-										/>
-										<span className="label-stack">
-											<span className="pill-label">{item.label}</span>
-											<span aria-hidden="true" className="pill-label-hover">
-												{item.label}
-											</span>
-										</span>
-									</Link>
-								)}
-							</li>
-						))}
-					</ul>
-				</div>
+						<ul
+							className="m-0 flex h-full list-none items-stretch gap-[3px] p-[3px]"
+							style={{ fontFamily: "var(--font-jetbrains-mono), monospace" }}
+						>
+							{leftItems.map((item, localIndex) => {
+								const i = localIndex;
+								return (
+									<li className="flex h-full" key={item.href}>
+										{isAnchorLink(item.href) ? (
+											<a
+												aria-label={item.label}
+												className="pill"
+												href={item.href}
+												onClick={(e) => {
+													e.preventDefault();
+													handleScrollTo(item.href);
+												}}
+												onMouseEnter={() => handleEnter(i)}
+												onMouseLeave={() => handleLeave(i)}
+											>
+												<span
+													aria-hidden="true"
+													className="hover-circle"
+													ref={(el) => {
+														circleRefs.current[i] = el;
+													}}
+												/>
+												<span className="label-stack">
+													<span className="pill-label">{item.label}</span>
+													<span aria-hidden="true" className="pill-label-hover">
+														{item.label}
+													</span>
+												</span>
+											</a>
+										) : (
+											<Link
+												aria-label={item.label}
+												className="pill"
+												href={item.href as never}
+												onMouseEnter={() => handleEnter(i)}
+												onMouseLeave={() => handleLeave(i)}
+											>
+												<span
+													aria-hidden="true"
+													className="hover-circle"
+													ref={(el) => {
+														circleRefs.current[i] = el;
+													}}
+												/>
+												<span className="label-stack">
+													<span className="pill-label">{item.label}</span>
+													<span aria-hidden="true" className="pill-label-hover">
+														{item.label}
+													</span>
+												</span>
+											</Link>
+										)}
+									</li>
+								);
+							})}
+						</ul>
+					</div>
+				)}
 
 				<button
 					aria-label="Scroll to top"
-					className="pill-logo"
+					className="pill-logo relative z-10"
 					onClick={handleScrollToTop}
 					onMouseEnter={handleLogoEnter}
 					ref={logoRef}
@@ -381,6 +392,77 @@ export default function PillNav({
 						/>
 					</span>
 				</button>
+
+				{rightItems.length > 0 && (
+					<div
+						className="nav-pill-group relative flex h-[42px] items-center rounded-full bg-white max-md:hidden dark:bg-black"
+						ref={(el) => {
+							navItemsRefs.current[1] = el;
+						}}
+					>
+						<ul
+							className="m-0 flex h-full list-none items-stretch gap-[3px] p-[3px]"
+							style={{ fontFamily: "var(--font-jetbrains-mono), monospace" }}
+						>
+							{rightItems.map((item, localIndex) => {
+								const i = half + localIndex;
+								return (
+									<li className="flex h-full" key={item.href}>
+										{isAnchorLink(item.href) ? (
+											<a
+												aria-label={item.label}
+												className="pill"
+												href={item.href}
+												onClick={(e) => {
+													e.preventDefault();
+													handleScrollTo(item.href);
+												}}
+												onMouseEnter={() => handleEnter(i)}
+												onMouseLeave={() => handleLeave(i)}
+											>
+												<span
+													aria-hidden="true"
+													className="hover-circle"
+													ref={(el) => {
+														circleRefs.current[i] = el;
+													}}
+												/>
+												<span className="label-stack">
+													<span className="pill-label">{item.label}</span>
+													<span aria-hidden="true" className="pill-label-hover">
+														{item.label}
+													</span>
+												</span>
+											</a>
+										) : (
+											<Link
+												aria-label={item.label}
+												className="pill"
+												href={item.href as never}
+												onMouseEnter={() => handleEnter(i)}
+												onMouseLeave={() => handleLeave(i)}
+											>
+												<span
+													aria-hidden="true"
+													className="hover-circle"
+													ref={(el) => {
+														circleRefs.current[i] = el;
+													}}
+												/>
+												<span className="label-stack">
+													<span className="pill-label">{item.label}</span>
+													<span aria-hidden="true" className="pill-label-hover">
+														{item.label}
+													</span>
+												</span>
+											</Link>
+										)}
+									</li>
+								);
+							})}
+						</ul>
+					</div>
+				)}
 
 				<button
 					aria-label="Toggle menu"

@@ -2,7 +2,10 @@
 
 import PillNav from "./pill-nav";
 
-const NAV_ITEMS = [{ label: "Works", href: "#works" }];
+const NAV_ITEMS = [
+	{ label: "About", href: "#about" },
+	{ label: "Works", href: "#works" },
+];
 
 export default function Header() {
 	return (
