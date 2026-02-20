@@ -4,7 +4,6 @@ import { Geist, Geist_Mono, JetBrains_Mono } from "next/font/google";
 import localFont from "next/font/local";
 
 import "../index.css";
-import Header from "@/components/header";
 import Providers from "@/components/providers";
 
 const geistSans = Geist({
@@ -65,10 +64,7 @@ export default function RootLayout({
 				className={`${geistSans.variable} ${geistMono.variable} ${jetbrainsMono.variable} ${telma.variable} antialiased`}
 			>
 				<Providers>
-					<div className="grid min-h-svh grid-rows-[auto_1fr]">
-						<Header />
-						{children}
-					</div>
+					<div className="min-h-svh">{children}</div>
 				</Providers>
 			</body>
 		</html>
