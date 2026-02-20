@@ -1,5 +1,6 @@
 "use client";
 
+import AboutSection from "@/components/about-section";
 import Header from "@/components/header";
 import HeroSection from "@/components/hero-section";
 import IntroLoader from "@/components/intro-loader";
@@ -11,6 +12,7 @@ export default function Home() {
 			<div className="grid min-h-svh grid-rows-[auto_1fr]">
 				<Header />
 				<HeroSection />
+				<AboutSection />
 				<WorksSection />
 			</div>
 		</IntroLoader>
