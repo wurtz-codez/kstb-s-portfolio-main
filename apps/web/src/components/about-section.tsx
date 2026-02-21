@@ -30,6 +30,16 @@ export default function AboutSection() {
 
 	const [showLine4, setShowLine4] = useState(false);
 	const [showLine5, setShowLine5] = useState(false);
+	const [line1Complete, setLine1Complete] = useState(false);
+	const [line2Complete, setLine2Complete] = useState(false);
+	const [line3Complete, setLine3Complete] = useState(false);
+	const [line4Complete, setLine4Complete] = useState(false);
+	const [line4Eligible, setLine4Eligible] = useState(false);
+	const [line5Eligible, setLine5Eligible] = useState(false);
+	const [line3BaseDone, setLine3BaseDone] = useState(false);
+	const [line3TypeDone, setLine3TypeDone] = useState(false);
+	const [sequenceId, setSequenceId] = useState(0);
+	const sequenceIdRef = useRef(0);
 
 	const [activeIndex, setActiveIndex] = useState(0);
 	const [displayedType, setDisplayedType] = useState(TYPES[0]);
@@ -37,10 +47,8 @@ export default function AboutSection() {
 	const [hasTyped, setHasTyped] = useState(false);
 
 	useEffect(() => {
-		if (activeIndex > 0) {
-			setHasTyped(true);
-		}
-	}, [activeIndex]);
+		sequenceIdRef.current = sequenceId;
+	}, [sequenceId]);
 
 	useEffect(() => {
 		if (!loaderComplete) {
@@ -64,29 +72,48 @@ export default function AboutSection() {
 				}
 			);
 
-			// 2. Sequential chat bubbles with re-trigger on scroll up/down
+			// 2. Start chat sequence when section enters
 			ScrollTrigger.create({
 				trigger: sectionRef.current,
-				start: "top 35%", // Line 1
-				end: "top 20%",
-				onEnter: () => setShowLine1(true),
-				onLeaveBack: () => setShowLine1(false),
-			});
-
-			ScrollTrigger.create({
-				trigger: sectionRef.current,
-				start: "top 20%", // Line 2 (Wait for 15% of scroll)
-				end: "top 10%",
-				onEnter: () => setShowLine2(true),
-				onLeaveBack: () => setShowLine2(false),
-			});
-
-			ScrollTrigger.create({
-				trigger: sectionRef.current,
-				start: "top 5%", // Line 3 (Wait for 15% of scroll)
-				end: "top top",
-				onEnter: () => setShowLine3(true),
-				onLeaveBack: () => setShowLine3(false),
+				start: "top 35%",
+				onEnter: () => {
+					setSequenceId((prev) => prev + 1);
+					setActiveIndex(0);
+					setDisplayedType(TYPES[0]);
+					currentTypeRef.current = TYPES[0];
+					setHasTyped(false);
+					setShowLine1(true);
+					setShowLine2(false);
+					setShowLine3(false);
+					setShowLine4(false);
+					setShowLine5(false);
+					setLine1Complete(false);
+					setLine2Complete(false);
+					setLine3Complete(false);
+					setLine4Complete(false);
+					setLine3BaseDone(false);
+					setLine3TypeDone(hasTyped);
+				},
+				onLeaveBack: () => {
+					setSequenceId((prev) => prev + 1);
+					setActiveIndex(0);
+					setDisplayedType(TYPES[0]);
+					currentTypeRef.current = TYPES[0];
+					setHasTyped(false);
+					setShowLine1(false);
+					setShowLine2(false);
+					setShowLine3(false);
+					setShowLine4(false);
+					setShowLine5(false);
+					setLine1Complete(false);
+					setLine2Complete(false);
+					setLine3Complete(false);
+					setLine4Complete(false);
+					setLine4Eligible(false);
+					setLine5Eligible(false);
+					setLine3BaseDone(false);
+					setLine3TypeDone(false);
+				},
 			});
 
 			// 3. Pin section and scrub through indices
@@ -100,14 +127,10 @@ export default function AboutSection() {
 				scrub: 1, // Add smoothing
 				onUpdate: (self) => {
 					const progress = self.progress;
-					const newIndex = Math.floor(progress * TOTAL_STEPS);
-
-					setActiveIndex(Math.min(newIndex, TYPES.length - 1));
-
-					// Each step represents 1 / TOTAL_STEPS of the total scroll progress.
-					// Line 4 and 5 should appear only when the progress definitively hits their specific "step bucket".
-					setShowLine4(newIndex >= TYPES.length);
-					setShowLine5(newIndex >= TYPES.length + 1);
+					const line4Progress = TYPES.length / TOTAL_STEPS;
+					const line5Progress = (TYPES.length + 1) / TOTAL_STEPS;
+					setLine4Eligible(progress >= line4Progress);
+					setLine5Eligible(progress >= line5Progress);
 				},
 			});
 		}, sectionRef);
@@ -116,6 +139,105 @@ export default function AboutSection() {
 			ctx.revert();
 		};
 	}, [loaderComplete]);
+
+	useEffect(() => {
+		if (!line1Complete || showLine2) {
+			return;
+		}
+		setShowLine2(true);
+	}, [line1Complete, showLine2]);
+
+	useEffect(() => {
+		if (!line2Complete || showLine3) {
+			return;
+		}
+		setShowLine3(true);
+	}, [line2Complete, showLine3]);
+
+	useEffect(() => {
+		if (!line3Complete || showLine4 || !line4Eligible) {
+			return;
+		}
+		setShowLine4(true);
+	}, [line3Complete, showLine4, line4Eligible]);
+
+	useEffect(() => {
+		if (!line4Complete || showLine5 || !line5Eligible) {
+			return;
+		}
+		setShowLine5(true);
+	}, [line4Complete, showLine5, line5Eligible]);
+
+	useEffect(() => {
+		if (!(line3BaseDone && line3TypeDone) || line3Complete) {
+			return;
+		}
+		setLine3Complete(true);
+	}, [line3BaseDone, line3TypeDone, line3Complete]);
+
+	useEffect(() => {
+		if (!showLine3) {
+			return;
+		}
+		const targetText = TYPES[activeIndex] ?? "";
+		if (displayedType !== targetText || !hasTyped) {
+			return;
+		}
+		const sequenceToken = sequenceIdRef.current;
+		const timeoutId = window.setTimeout(() => {
+			if (sequenceIdRef.current !== sequenceToken) {
+				return;
+			}
+			setActiveIndex((prev) => (prev + 1) % TYPES.length);
+		}, 700);
+
+		return () => {
+			window.clearTimeout(timeoutId);
+		};
+	}, [showLine3, activeIndex, displayedType, hasTyped]);
+
+	useEffect(() => {
+		if (!(showLine3 && hasTyped)) {
+			return;
+		}
+		setLine3TypeDone(true);
+	}, [showLine3, hasTyped]);
+
+	const sequenceIdSnapshot = sequenceId;
+	const handleLine1Complete = () => {
+		if (sequenceIdRef.current !== sequenceIdSnapshot) {
+			return;
+		}
+		setLine1Complete(true);
+	};
+
+	const handleLine2Complete = () => {
+		if (sequenceIdRef.current !== sequenceIdSnapshot) {
+			return;
+		}
+		setLine2Complete(true);
+	};
+
+	const handleLine3BaseComplete = () => {
+		if (sequenceIdRef.current !== sequenceIdSnapshot) {
+			return;
+		}
+		setLine3BaseDone(true);
+	};
+
+	const handleLine3TypeComplete = () => {
+		if (sequenceIdRef.current !== sequenceIdSnapshot) {
+			return;
+		}
+		setHasTyped(true);
+	};
+
+	const handleLine4Complete = () => {
+		if (sequenceIdRef.current !== sequenceIdSnapshot) {
+			return;
+		}
+		setLine4Complete(true);
+	};
 
 	// Automatic Typewriter logic handling backspaces character-by-character
 	useEffect(() => {
@@ -238,6 +360,7 @@ export default function AboutSection() {
 								<BlurText
 									delay={150}
 									direction="bottom"
+									onAnimationComplete={handleLine1Complete}
 									stepDuration={0.8}
 									text="Who are you!?"
 								/>
@@ -260,6 +383,7 @@ export default function AboutSection() {
 							>
 								<BlurText
 									delay={150}
+									onAnimationComplete={handleLine2Complete}
 									stepDuration={0.8}
 									text="hmm, good question..."
 								/>
@@ -287,7 +411,12 @@ export default function AboutSection() {
 										alignItems: "center",
 									}}
 								>
-									<BlurText delay={150} stepDuration={0.8} text="I am a " />
+									<BlurText
+										delay={150}
+										onAnimationComplete={handleLine3BaseComplete}
+										stepDuration={0.8}
+										text="I am a "
+									/>
 									<span
 										style={{
 											marginLeft: "0.5rem",
@@ -306,6 +435,7 @@ export default function AboutSection() {
 											<BlurText
 												className="m-0"
 												delay={150}
+												onAnimationComplete={handleLine3TypeComplete}
 												stepDuration={0.8}
 												text={TYPES[0]}
 											/>
@@ -340,6 +470,7 @@ export default function AboutSection() {
 								<BlurText
 									delay={150}
 									direction="bottom"
+									onAnimationComplete={handleLine4Complete}
 									stepDuration={0.8}
 									text="how do you manage all of this stuff!?"
 								/>

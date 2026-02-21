@@ -4,7 +4,6 @@ import gsap from "gsap";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import BottomText from "@/components/bottom-text";
-import LiquidEther from "@/components/liquid-ether";
 import { useLoader } from "@/contexts/loader-context";
 
 /**
@@ -164,20 +163,6 @@ export default function HeroSection() {
 				pointerEvents: loaderComplete ? "auto" : "none",
 			}}
 		>
-			<LiquidEther
-				autoDemo
-				autoIntensity={2.2}
-				autoSpeed={0.5}
-				colors={["#ebf8ff", "#000000", "#676871"]}
-				cursorSize={100}
-				isBounce={false}
-				isViscous
-				iterationsPoisson={32}
-				iterationsViscous={32}
-				mouseForce={33}
-				resolution={0.5}
-				viscous={30}
-			/>
 			<div
 				style={{
 					position: "relative",
