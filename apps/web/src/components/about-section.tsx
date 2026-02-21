@@ -57,9 +57,9 @@ export default function AboutSection() {
 					ease: "none",
 					scrollTrigger: {
 						trigger: sectionRef.current,
-						start: "top 90%", // Start expanding slightly earlier
-						end: "top 10%", // Take longer to fully expand (doesn't finish until very close to the top)
-						scrub: 2, // Slower smooth scrub (higher number = more smoothing lag)
+						start: "top bottom", // Start as section enters viewport
+						end: "top top", // Finish when section reaches top of viewport
+						scrub: 2.6, // Slower smooth scrub (higher number = more smoothing lag)
 					},
 				}
 			);
