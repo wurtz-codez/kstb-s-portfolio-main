@@ -26,6 +26,7 @@
   "dependencies": {
     "@kstb-s-portfolio/env": "workspace:*",
     "dotenv": "catalog:",
+    "gl-matrix": "^3.4.4",
     "zod": "catalog:"
   },
   "devDependencies": {
