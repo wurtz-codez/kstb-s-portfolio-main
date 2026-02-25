@@ -129,8 +129,8 @@ export default function WorksSection() {
 				backgroundColor: "#000",
 				zIndex: 10,
 				width: "100%",
-				paddingTop: "10rem",
-				paddingBottom: "10rem",
+				paddingTop: "clamp(4rem, 10vw, 8rem)",
+				paddingBottom: "clamp(4rem, 10vw, 8rem)",
 			}}
 		>
 			<div

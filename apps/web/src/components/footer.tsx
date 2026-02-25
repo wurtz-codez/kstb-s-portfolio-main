@@ -498,7 +498,7 @@ export default function Footer() {
 				backgroundColor: "#000",
 				background:
 					"radial-gradient(ellipse at 20% 50%, rgba(30, 30, 30, 0.5) 0%, transparent 60%), radial-gradient(ellipse at 80% 80%, rgba(20, 20, 20, 0.8) 0%, transparent 50%), #000",
-				padding: "clamp(3rem, 8vw, 6rem) clamp(1.5rem, 5vw, 4rem)",
+				padding: "clamp(4rem, 10vw, 8rem) clamp(1.5rem, 5vw, 4rem)",
 				color: "rgba(255, 255, 255, 0.8)",
 			}}
 		>

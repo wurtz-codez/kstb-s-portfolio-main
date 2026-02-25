@@ -296,7 +296,6 @@ export default function AboutSection() {
 						width: "100%",
 						margin: "0 auto",
 						zIndex: 10,
-						paddingBottom: "2rem",
 					}}
 				>
 					{/* Line 1 — right-aligned (sender) */}

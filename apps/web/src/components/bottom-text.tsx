@@ -18,12 +18,12 @@ export default function BottomText() {
 		<div
 			style={{
 				position: "absolute",
-				bottom: "2rem",
+				bottom: "clamp(1.5rem, 5vw, 4rem)",
 				left: 0,
 				right: 0,
 				display: "flex",
 				justifyContent: "space-between",
-				padding: "0 clamp(1rem, 5vw, 4rem)",
+				padding: "0 clamp(1.5rem, 5vw, 4rem)",
 				gap: "1rem",
 			}}
 		>
