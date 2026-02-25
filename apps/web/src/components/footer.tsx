@@ -12,10 +12,10 @@ gsap.registerPlugin(ScrollTrigger);
 const FONT_MONO = "var(--font-jetbrains-mono), monospace";
 
 const SOCIAL_LINKS = [
-	{ label: "GitHub", href: "https://github.com/koustubhpande" },
-	{ label: "Twitter / X", href: "https://twitter.com/koustubhpande" },
-	{ label: "LinkedIn", href: "https://linkedin.com/in/koustubhpande" },
-	{ label: "Instagram", href: "https://instagram.com/koustubhpande" },
+	{ label: "GitHub", href: "https://github.com/wurtz-codez" },
+	{ label: "Twitter / X", href: "https://x.com/wurtz_codez" },
+	{ label: "LinkedIn", href: "https://www.linkedin.com/in/koustubh-pande/" },
+	// { label: "Instagram", href: "https://instagram.com/koustubhpande" },
 ] as const;
 
 const NAV_LINKS = [
