@@ -22,7 +22,8 @@ const TYPES = [
 const LINE_COUNT = 5;
 
 // Scroll progress thresholds at which each chat line appears (0–1 range)
-const LINE_THRESHOLDS = [0.05, 0.2, 0.35, 0.55, 0.7] as const;
+// Line 1 appears immediately (0) when circle reveal completes and pinning starts
+const LINE_THRESHOLDS = [0, 0.15, 0.3, 0.5, 0.65] as const;
 
 // Pop animation config
 const POP_DURATION = 0.3;
@@ -132,6 +133,14 @@ export default function AboutSection() {
 				end: `+=${scrollDistance}`,
 				pin: true,
 				scrub: 1,
+				onEnter: () => {
+					// Pop in Line 1 immediately when section pins at top
+					const el = lineRefsArray.current[0].current;
+					if (el && !lineVisibleRef.current[0]) {
+						lineVisibleRef.current[0] = true;
+						popIn(el);
+					}
+				},
 				onUpdate: (self) => {
 					const { progress } = self;
 

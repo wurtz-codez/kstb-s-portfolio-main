@@ -93,18 +93,20 @@ export default function WorksSection() {
 			gsap.fromTo(
 				menuEl,
 				{
-					scale: 0.2,
+					scale: 0.3,
 					opacity: 0,
+					clipPath: "circle(0% at 50% 50%)",
 				},
 				{
 					scale: 1,
 					opacity: 1,
-					ease: "power3.out",
+					clipPath: "circle(150% at 50% 50%)",
+					ease: "power2.out",
 					scrollTrigger: {
 						trigger: containerEl,
-						start: "top 80%",
-						end: "top 20%",
-						scrub: 1,
+						start: "top 90%",
+						end: "top 10%",
+						scrub: 2,
 					},
 				}
 			);

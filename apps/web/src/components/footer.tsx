@@ -18,6 +18,16 @@ const SOCIAL_LINKS = [
 	// { label: "Instagram", href: "https://instagram.com/koustubhpande" },
 ] as const;
 
+const SELECTED_WORKS = [
+	{ label: "verq", href: "https://verqai.vercel.app" },
+	{ label: "arkaiv", href: "https://arkaiv.vercel.app" },
+	{ label: "Jewelry by LUNA", href: "https://www.jewelrybyluna.in" },
+	{
+		label: "ALLROUND",
+		href: "https://github.com/singularityworks-xyz/ALLROUND",
+	},
+] as const;
+
 const NAV_LINKS = [
 	{ label: "Home", href: "/" },
 	{ label: "Projects", href: "/#works" },
@@ -587,7 +597,11 @@ export default function Footer() {
 								</DecryptedText>
 							</div>
 							<div className="flex flex-col items-start gap-1">
-								<MagneticLink href="/#works">Projects</MagneticLink>
+								{SELECTED_WORKS.map((work) => (
+									<MagneticLink external href={work.href} key={work.label}>
+										{work.label}
+									</MagneticLink>
+								))}
 							</div>
 						</div>
 
