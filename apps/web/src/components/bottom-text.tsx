@@ -16,6 +16,7 @@ export default function BottomText() {
 
 	return (
 		<div
+			className="bottom-text-points"
 			style={{
 				position: "absolute",
 				bottom: "clamp(1.5rem, 5vw, 4rem)",

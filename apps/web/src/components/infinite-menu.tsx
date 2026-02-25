@@ -1336,44 +1336,62 @@ const InfiniteMenu: FC<InfiniteMenuProps> = ({ items = [], scale = 1.0 }) => {
 			{activeItem && (
 				<>
 					<h2
-						className={`absolute top-1/2 left-[25%] translate-x-[-50%] -translate-y-1/2 transform select-none font-black transition-all ease-[cubic-bezier(0.25,0.1,0.25,1.0)] [font-size:4rem] ${
+						className={`absolute top-1/2 -translate-x-1/2 -translate-y-1/2 transform select-none font-black transition-all ease-[cubic-bezier(0.25,0.1,0.25,1.0)] ${
 							isMoving
 								? "pointer-events-none opacity-0 duration-[100ms]"
 								: "pointer-events-auto opacity-100 duration-[500ms]"
-						}
-        `}
+						}`}
+						style={{
+							left: "clamp(15%, 25%, 35%)",
+							fontSize: "clamp(2rem, 8vw, 4rem)",
+						}}
 					>
 						{activeItem.title}
 					</h2>
 
 					<p
-						className={`absolute top-1/2 right-[25%] max-w-[12ch] select-none text-[1.5rem] transition-all ease-[cubic-bezier(0.25,0.1,0.25,1.0)] ${
+						className={`absolute top-1/2 -translate-y-1/2 select-none transition-all ease-[cubic-bezier(0.25,0.1,0.25,1.0)] ${
 							isMoving
-								? "pointer-events-none -translate-y-1/2 opacity-0 duration-[100ms]"
-								: "pointer-events-auto -translate-y-1/2 opacity-100 duration-[500ms]"
-						}
-        `}
+								? "pointer-events-none opacity-0 duration-[100ms]"
+								: "pointer-events-auto opacity-100 duration-[500ms]"
+						}`}
+						style={{
+							right: "clamp(5%, 15%, 25%)",
+							maxWidth: "12ch",
+							fontSize: "clamp(0.875rem, 2.5vw, 1.5rem)",
+						}}
 					>
 						{activeItem.description}
 					</p>
 
 					<button
 						aria-label={`Open ${activeItem.title}`}
-						className={`absolute left-1/2 z-10 grid h-[60px] w-[60px] cursor-pointer place-items-center rounded-full border-[5px] border-black bg-[#00ffff] transition-all ease-[cubic-bezier(0.25,0.1,0.25,1.0)] ${
+						className={`absolute left-1/2 z-10 grid cursor-pointer place-items-center rounded-full border-[5px] border-black bg-[#00ffff] transition-all ease-[cubic-bezier(0.25,0.1,0.25,1.0)] ${
 							isMoving
 								? "pointer-events-none bottom-[-80px] -translate-x-1/2 scale-0 opacity-0 duration-[100ms]"
 								: "pointer-events-auto bottom-[3.8em] -translate-x-1/2 scale-100 opacity-100 duration-[500ms]"
-						}
-        `}
+						}`}
 						onClick={handleButtonClick}
 						onKeyUp={(e) => {
 							if (e.key === "Enter" || e.key === " ") {
 								handleButtonClick();
 							}
 						}}
+						style={{
+							width: "clamp(40px, 10vw, 60px)",
+							height: "clamp(40px, 10vw, 60px)",
+						}}
 						type="button"
 					>
-						<span className="relative top-[2px] select-none text-[#060010] text-[26px]">
+						<span
+							className="select-none"
+							style={{
+								color: "#060010",
+								fontSize: "clamp(16px, 4vw, 26px)",
+								position: "relative",
+								top: "2px",
+							}}
+						>
 							&#x2197;
 						</span>
 					</button>

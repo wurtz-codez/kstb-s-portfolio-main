@@ -520,7 +520,7 @@ export default function Footer() {
 					<div
 						style={{
 							fontFamily: "var(--font-telma)",
-							fontSize: "clamp(2.5rem, 8vw, 5.5rem)",
+							fontSize: "clamp(1.75rem, 6vw, 5.5rem)",
 							fontWeight: 700,
 							lineHeight: 1,
 							letterSpacing: "-0.02em",
@@ -554,7 +554,7 @@ export default function Footer() {
 						<div className="flex flex-col gap-4">
 							<div
 								style={{
-									fontSize: "0.7rem",
+									fontSize: "clamp(0.6rem, 1.2vw, 0.7rem)",
 									textTransform: "uppercase",
 									letterSpacing: "0.15em",
 									color: "rgba(255, 255, 255, 0.35)",
@@ -581,7 +581,7 @@ export default function Footer() {
 						<div className="flex flex-col gap-4">
 							<div
 								style={{
-									fontSize: "0.7rem",
+									fontSize: "clamp(0.6rem, 1.2vw, 0.7rem)",
 									textTransform: "uppercase",
 									letterSpacing: "0.15em",
 									color: "rgba(255, 255, 255, 0.35)",
@@ -609,7 +609,7 @@ export default function Footer() {
 						<div className="flex flex-col gap-4">
 							<div
 								style={{
-									fontSize: "0.7rem",
+									fontSize: "clamp(0.6rem, 1.2vw, 0.7rem)",
 									textTransform: "uppercase",
 									letterSpacing: "0.15em",
 									color: "rgba(255, 255, 255, 0.35)",
@@ -648,7 +648,7 @@ export default function Footer() {
 						<div className="flex flex-col gap-3">
 							<div
 								style={{
-									fontSize: "0.7rem",
+									fontSize: "clamp(0.6rem, 1.2vw, 0.7rem)",
 									textTransform: "uppercase",
 									letterSpacing: "0.15em",
 									color: "rgba(255, 255, 255, 0.35)",
@@ -692,7 +692,7 @@ export default function Footer() {
 						>
 							<span
 								style={{
-									fontSize: "0.7rem",
+									fontSize: "clamp(0.6rem, 1.2vw, 0.7rem)",
 									textTransform: "uppercase",
 									letterSpacing: "0.15em",
 									color: "rgba(255, 255, 255, 0.35)",
@@ -730,7 +730,7 @@ export default function Footer() {
 							>
 								<span
 									style={{
-										fontSize: "0.7rem",
+										fontSize: "clamp(0.6rem, 1.2vw, 0.7rem)",
 										textTransform: "uppercase",
 										letterSpacing: "0.15em",
 										color: "rgba(255, 255, 255, 0.35)",

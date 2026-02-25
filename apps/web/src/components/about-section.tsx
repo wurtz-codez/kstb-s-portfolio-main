@@ -301,8 +301,8 @@ export default function AboutSection() {
 					{/* Line 1 — right-aligned (sender) */}
 					<div
 						style={{
-							minHeight: "4rem",
-							marginBottom: "4rem",
+							minHeight: "clamp(2.5rem, 6vw, 4rem)",
+							marginBottom: "clamp(1.5rem, 4vw, 4rem)",
 							display: "flex",
 							justifyContent: "flex-end",
 						}}
@@ -311,11 +311,12 @@ export default function AboutSection() {
 							ref={line1Ref}
 							style={{
 								display: "inline-block",
-								padding: "1rem 1.5rem",
+								padding:
+									"clamp(0.6rem, 2vw, 1rem) clamp(0.8rem, 2.5vw, 1.5rem)",
 								backgroundColor: "rgba(255, 255, 255, 0.1)",
 								borderRadius: "1rem 1rem 0 1rem",
 								fontFamily: FONT_MONO,
-								fontSize: "clamp(1.2rem, 3vw, 1.8rem)",
+								fontSize: "clamp(1rem, 2.5vw, 1.8rem)",
 								color: "rgba(255, 255, 255, 0.6)",
 								opacity: 0,
 								scale: 0,
@@ -327,16 +328,22 @@ export default function AboutSection() {
 					</div>
 
 					{/* Line 2 — left-aligned (receiver) */}
-					<div style={{ minHeight: "4rem", marginBottom: "4rem" }}>
+					<div
+						style={{
+							minHeight: "clamp(2.5rem, 6vw, 4rem)",
+							marginBottom: "clamp(1.5rem, 4vw, 4rem)",
+						}}
+					>
 						<div
 							ref={line2Ref}
 							style={{
 								display: "inline-block",
-								padding: "1rem 1.5rem",
+								padding:
+									"clamp(0.6rem, 2vw, 1rem) clamp(0.8rem, 2.5vw, 1.5rem)",
 								backgroundColor: "rgba(255, 255, 255, 0.05)",
 								borderRadius: "1rem 1rem 1rem 0",
 								fontFamily: FONT_MONO,
-								fontSize: "clamp(1.2rem, 3vw, 1.8rem)",
+								fontSize: "clamp(1rem, 2.5vw, 1.8rem)",
 								opacity: 0,
 								scale: 0,
 								transformOrigin: "bottom left",
@@ -347,16 +354,22 @@ export default function AboutSection() {
 					</div>
 
 					{/* Line 3 — left-aligned (receiver, with typewriter) */}
-					<div style={{ minHeight: "4rem", marginBottom: "4rem" }}>
+					<div
+						style={{
+							minHeight: "clamp(2.5rem, 6vw, 4rem)",
+							marginBottom: "clamp(1.5rem, 4vw, 4rem)",
+						}}
+					>
 						<div
 							ref={line3Ref}
 							style={{
 								display: "inline-block",
-								padding: "1rem 1.5rem",
+								padding:
+									"clamp(0.6rem, 2vw, 1rem) clamp(0.8rem, 2.5vw, 1.5rem)",
 								backgroundColor: "rgba(255, 255, 255, 0.05)",
 								borderRadius: "1rem 1rem 1rem 0",
 								fontFamily: FONT_MONO,
-								fontSize: "clamp(1.2rem, 3vw, 1.8rem)",
+								fontSize: "clamp(1rem, 2.5vw, 1.8rem)",
 								opacity: 0,
 								scale: 0,
 								transformOrigin: "bottom left",
@@ -391,8 +404,8 @@ export default function AboutSection() {
 					{/* Line 4 — right-aligned (sender) */}
 					<div
 						style={{
-							minHeight: "4rem",
-							marginBottom: "4rem",
+							minHeight: "clamp(2.5rem, 6vw, 4rem)",
+							marginBottom: "clamp(1.5rem, 4vw, 4rem)",
 							display: "flex",
 							justifyContent: "flex-end",
 						}}
@@ -401,11 +414,12 @@ export default function AboutSection() {
 							ref={line4Ref}
 							style={{
 								display: "inline-block",
-								padding: "1rem 1.5rem",
+								padding:
+									"clamp(0.6rem, 2vw, 1rem) clamp(0.8rem, 2.5vw, 1.5rem)",
 								backgroundColor: "rgba(255, 255, 255, 0.1)",
 								borderRadius: "1rem 1rem 0 1rem",
 								fontFamily: FONT_MONO,
-								fontSize: "clamp(1.2rem, 3vw, 1.8rem)",
+								fontSize: "clamp(1rem, 2.5vw, 1.8rem)",
 								color: "rgba(255, 255, 255, 0.6)",
 								opacity: 0,
 								scale: 0,
@@ -417,18 +431,24 @@ export default function AboutSection() {
 					</div>
 
 					{/* Line 5 — left-aligned (receiver) */}
-					<div style={{ minHeight: "4rem", marginBottom: "0rem" }}>
+					<div
+						style={{
+							minHeight: "clamp(2.5rem, 6vw, 4rem)",
+							marginBottom: "0rem",
+						}}
+					>
 						<div
 							ref={line5Ref}
 							style={{
 								display: "flex",
 								flexWrap: "wrap",
 								alignItems: "center",
-								padding: "1rem 1.5rem",
+								padding:
+									"clamp(0.6rem, 2vw, 1rem) clamp(0.8rem, 2.5vw, 1.5rem)",
 								backgroundColor: "rgba(255, 255, 255, 0.05)",
 								borderRadius: "1rem 1rem 1rem 0",
 								fontFamily: FONT_MONO,
-								fontSize: "clamp(1.2rem, 3vw, 1.8rem)",
+								fontSize: "clamp(1rem, 2.5vw, 1.8rem)",
 								opacity: 0,
 								scale: 0,
 								transformOrigin: "bottom left",

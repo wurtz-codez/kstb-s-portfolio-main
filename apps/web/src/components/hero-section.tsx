@@ -200,7 +200,7 @@ export default function HeroSection() {
 						style={{
 							cursor: "default",
 							userSelect: "none",
-							width: "clamp(280px, 70vw, 600px)",
+							width: "clamp(180px, 70vw, 600px)",
 						}}
 					>
 						<svg

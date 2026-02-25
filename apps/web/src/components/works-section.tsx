@@ -100,11 +100,6 @@ export default function WorksSection() {
 			});
 
 			tl.fromTo(
-				containerEl,
-				{ clipPath: "circle(0% at 50% 50%)" },
-				{ clipPath: "circle(150% at 50% 50%)", ease: "none" },
-				0
-			).fromTo(
 				menuEl,
 				{ scale: 0.2, opacity: 0 },
 				{ scale: 1, opacity: 1, ease: "power2.out" },
@@ -136,7 +131,7 @@ export default function WorksSection() {
 			<div
 				ref={menuWrapperRef}
 				style={{
-					height: "800px",
+					height: "clamp(400px, 60vh, 800px)",
 					position: "relative",
 					width: "100%",
 					transformOrigin: "center center",
