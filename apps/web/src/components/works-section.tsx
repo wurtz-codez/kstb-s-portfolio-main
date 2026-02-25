@@ -1,8 +1,13 @@
 "use client";
 
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useEffect, useRef } from "react";
 import type { Project } from "@/components/tilted-card";
 import { useLoader } from "@/contexts/loader-context";
 import InfiniteMenu from "./infinite-menu";
+
+gsap.registerPlugin(ScrollTrigger);
 
 // ---------------------------------------------------------------------------
 // Data
@@ -69,6 +74,44 @@ const items = PROJECTS.map((project, index) => ({
 
 export default function WorksSection() {
 	const { loaderComplete } = useLoader();
+	const containerRef = useRef<HTMLDivElement>(null);
+	const menuWrapperRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		if (!loaderComplete) {
+			return;
+		}
+
+		const containerEl = containerRef.current;
+		const menuEl = menuWrapperRef.current;
+
+		if (!(containerEl && menuEl)) {
+			return;
+		}
+
+		const ctx = gsap.context(() => {
+			gsap.fromTo(
+				menuEl,
+				{
+					scale: 0.2,
+					opacity: 0,
+				},
+				{
+					scale: 1,
+					opacity: 1,
+					ease: "power3.out",
+					scrollTrigger: {
+						trigger: containerEl,
+						start: "top 80%",
+						end: "top 20%",
+						scrub: 1,
+					},
+				}
+			);
+		}, containerEl);
+
+		return () => ctx.revert();
+	}, [loaderComplete]);
 
 	if (!loaderComplete) {
 		return null; // Or some loading state if needed, though usually handled centrally
@@ -77,6 +120,7 @@ export default function WorksSection() {
 	return (
 		<section
 			id="works"
+			ref={containerRef}
 			style={{
 				position: "relative",
 				overflow: "hidden",
@@ -87,7 +131,15 @@ export default function WorksSection() {
 				paddingBottom: "10rem",
 			}}
 		>
-			<div style={{ height: "800px", position: "relative", width: "100%" }}>
+			<div
+				ref={menuWrapperRef}
+				style={{
+					height: "800px",
+					position: "relative",
+					width: "100%",
+					transformOrigin: "center center",
+				}}
+			>
 				<InfiniteMenu items={items} scale={2} />
 			</div>
 		</section>

@@ -1,6 +1,7 @@
 "use client";
 
 import AboutSection from "@/components/about-section";
+import Footer from "@/components/footer";
 import Header from "@/components/header";
 import HeroSection from "@/components/hero-section";
 import IntroLoader from "@/components/intro-loader";
@@ -14,6 +15,7 @@ export default function Home() {
 				<HeroSection />
 				<AboutSection />
 				<WorksSection />
+				<Footer />
 			</div>
 		</IntroLoader>
 	);

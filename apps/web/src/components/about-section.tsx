@@ -2,8 +2,7 @@
 
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useEffect, useRef, useState } from "react";
-import BlurText from "@/components/blur-text";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useLoader } from "@/contexts/loader-context";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -18,45 +17,96 @@ const TYPES = [
 	"AI-driven system designer",
 	"UI/UX designer",
 	"co-founder of singularity works",
-];
+] as const;
+
+const LINE_COUNT = 5;
+
+// Scroll progress thresholds at which each chat line appears (0–1 range)
+const LINE_THRESHOLDS = [0.05, 0.2, 0.35, 0.55, 0.7] as const;
+
+// Pop animation config
+const POP_DURATION = 0.3;
+const POP_EASE = "back.out(1.7)";
+const UNPOP_DURATION = 0.2;
+const UNPOP_EASE = "power2.in";
+
+const popIn = (element: HTMLDivElement): void => {
+	gsap.killTweensOf(element);
+	gsap.fromTo(
+		element,
+		{ scale: 0, opacity: 0 },
+		{ scale: 1, opacity: 1, duration: POP_DURATION, ease: POP_EASE }
+	);
+};
+
+const popOut = (element: HTMLDivElement): void => {
+	gsap.killTweensOf(element);
+	gsap.to(element, {
+		scale: 0,
+		opacity: 0,
+		duration: UNPOP_DURATION,
+		ease: UNPOP_EASE,
+	});
+};
 
 export default function AboutSection() {
 	const { loaderComplete } = useLoader();
 	const sectionRef = useRef<HTMLElement>(null);
 	const innerRef = useRef<HTMLDivElement>(null);
-	const [showLine1, setShowLine1] = useState(false);
-	const [showLine2, setShowLine2] = useState(false);
-	const [showLine3, setShowLine3] = useState(false);
 
-	const [showLine4, setShowLine4] = useState(false);
-	const [showLine5, setShowLine5] = useState(false);
-	const [line1Complete, setLine1Complete] = useState(false);
-	const [line2Complete, setLine2Complete] = useState(false);
-	const [line3Complete, setLine3Complete] = useState(false);
-	const [line4Complete, setLine4Complete] = useState(false);
-	const [line4Eligible, setLine4Eligible] = useState(false);
-	const [line5Eligible, setLine5Eligible] = useState(false);
-	const [line3BaseDone, setLine3BaseDone] = useState(false);
-	const [line3TypeDone, setLine3TypeDone] = useState(false);
-	const [sequenceId, setSequenceId] = useState(0);
-	const sequenceIdRef = useRef(0);
+	// Refs for each chat bubble element
+	const line1Ref = useRef<HTMLDivElement>(null);
+	const line2Ref = useRef<HTMLDivElement>(null);
+	const line3Ref = useRef<HTMLDivElement>(null);
+	const line4Ref = useRef<HTMLDivElement>(null);
+	const line5Ref = useRef<HTMLDivElement>(null);
 
+	// Track which lines are currently visible (to avoid re-triggering animations)
+	const lineVisibleRef = useRef<boolean[]>(
+		Array.from({ length: LINE_COUNT }, () => false)
+	);
+
+	// Typewriter state
 	const [activeIndex, setActiveIndex] = useState(0);
-	const [displayedType, setDisplayedType] = useState(TYPES[0]);
-	const currentTypeRef = useRef(TYPES[0]);
+	const [displayedType, setDisplayedType] = useState<string>(TYPES[0]);
+	const currentTypeRef = useRef<string>(TYPES[0]);
 	const [hasTyped, setHasTyped] = useState(false);
+	const typewriterStartedRef = useRef(false);
+	const [line3Visible, setLine3Visible] = useState(false);
 
-	useEffect(() => {
-		sequenceIdRef.current = sequenceId;
-	}, [sequenceId]);
+	// Stable array of refs — individual refs never change identity
+	const lineRefsArray = useRef([
+		line1Ref,
+		line2Ref,
+		line3Ref,
+		line4Ref,
+		line5Ref,
+	]);
 
+	const resetAllLines = useCallback(() => {
+		for (const ref of lineRefsArray.current) {
+			if (ref.current) {
+				gsap.killTweensOf(ref.current);
+				gsap.set(ref.current, { scale: 0, opacity: 0 });
+			}
+		}
+		lineVisibleRef.current = Array.from({ length: LINE_COUNT }, () => false);
+		setLine3Visible(false);
+		setActiveIndex(0);
+		setDisplayedType(TYPES[0]);
+		currentTypeRef.current = TYPES[0];
+		setHasTyped(false);
+		typewriterStartedRef.current = false;
+	}, []);
+
+	// GSAP ScrollTrigger setup
 	useEffect(() => {
 		if (!loaderComplete) {
 			return;
 		}
 
 		const ctx = gsap.context(() => {
-			// 1. Circle to Full Screen Animation on Scroll Enter
+			// 1. Circle to full-screen reveal on scroll enter
 			gsap.fromTo(
 				innerRef.current,
 				{ clipPath: "circle(0% at 50% 50%)" },
@@ -65,72 +115,51 @@ export default function AboutSection() {
 					ease: "none",
 					scrollTrigger: {
 						trigger: sectionRef.current,
-						start: "top bottom", // Start as section enters viewport
-						end: "top top", // Finish when section reaches top of viewport
-						scrub: 2.6, // Slower smooth scrub (higher number = more smoothing lag)
+						start: "top bottom",
+						end: "top top",
+						scrub: 2.6,
 					},
 				}
 			);
 
-			// 2. Start chat sequence when section enters
-			ScrollTrigger.create({
-				trigger: sectionRef.current,
-				start: "top 35%",
-				onEnter: () => {
-					setSequenceId((prev) => prev + 1);
-					setActiveIndex(0);
-					setDisplayedType(TYPES[0]);
-					currentTypeRef.current = TYPES[0];
-					setHasTyped(false);
-					setShowLine1(true);
-					setShowLine2(false);
-					setShowLine3(false);
-					setShowLine4(false);
-					setShowLine5(false);
-					setLine1Complete(false);
-					setLine2Complete(false);
-					setLine3Complete(false);
-					setLine4Complete(false);
-					setLine3BaseDone(false);
-					setLine3TypeDone(hasTyped);
-				},
-				onLeaveBack: () => {
-					setSequenceId((prev) => prev + 1);
-					setActiveIndex(0);
-					setDisplayedType(TYPES[0]);
-					currentTypeRef.current = TYPES[0];
-					setHasTyped(false);
-					setShowLine1(false);
-					setShowLine2(false);
-					setShowLine3(false);
-					setShowLine4(false);
-					setShowLine5(false);
-					setLine1Complete(false);
-					setLine2Complete(false);
-					setLine3Complete(false);
-					setLine4Complete(false);
-					setLine4Eligible(false);
-					setLine5Eligible(false);
-					setLine3BaseDone(false);
-					setLine3TypeDone(false);
-				},
-			});
-
-			// 3. Pin section and scrub through indices
+			// 2. Pin section and use scroll progress to pop chat lines in/out
 			const TOTAL_STEPS = TYPES.length + 2;
-			const scrollDistance = TOTAL_STEPS * 1000; // 1000px per item to slow down scrolling
+			const scrollDistance = TOTAL_STEPS * 1000;
+
 			ScrollTrigger.create({
 				trigger: sectionRef.current,
 				start: "top top",
 				end: `+=${scrollDistance}`,
 				pin: true,
-				scrub: 1, // Add smoothing
+				scrub: 1,
 				onUpdate: (self) => {
-					const progress = self.progress;
-					const line4Progress = TYPES.length / TOTAL_STEPS;
-					const line5Progress = (TYPES.length + 1) / TOTAL_STEPS;
-					setLine4Eligible(progress >= line4Progress);
-					setLine5Eligible(progress >= line5Progress);
+					const { progress } = self;
+
+					for (let i = 0; i < LINE_COUNT; i++) {
+						const shouldShow = progress >= LINE_THRESHOLDS[i];
+						const isVisible = lineVisibleRef.current[i];
+						const el = lineRefsArray.current[i].current;
+
+						if (!el || shouldShow === isVisible) {
+							continue;
+						}
+
+						lineVisibleRef.current[i] = shouldShow;
+
+						if (shouldShow) {
+							popIn(el);
+						} else {
+							popOut(el);
+						}
+
+						// Track Line 3 visibility for typewriter
+						if (i === 2) {
+							setLine3Visible(shouldShow);
+						}
+					}
+				},
+				onLeaveBack: () => {
+					resetAllLines();
 				},
 			});
 		}, sectionRef);
@@ -138,158 +167,83 @@ export default function AboutSection() {
 		return () => {
 			ctx.revert();
 		};
-	}, [loaderComplete]);
+	}, [loaderComplete, resetAllLines]);
 
+	// Start the typewriter once Line 3 becomes visible
 	useEffect(() => {
-		if (!line1Complete || showLine2) {
+		if (!line3Visible || typewriterStartedRef.current) {
 			return;
 		}
-		setShowLine2(true);
-	}, [line1Complete, showLine2]);
+		typewriterStartedRef.current = true;
+		setHasTyped(true);
+	}, [line3Visible]);
 
+	// Auto-advance typewriter index after the current type finishes displaying
 	useEffect(() => {
-		if (!line2Complete || showLine3) {
-			return;
-		}
-		setShowLine3(true);
-	}, [line2Complete, showLine3]);
-
-	useEffect(() => {
-		if (!line3Complete || showLine4 || !line4Eligible) {
-			return;
-		}
-		setShowLine4(true);
-	}, [line3Complete, showLine4, line4Eligible]);
-
-	useEffect(() => {
-		if (!line4Complete || showLine5 || !line5Eligible) {
-			return;
-		}
-		setShowLine5(true);
-	}, [line4Complete, showLine5, line5Eligible]);
-
-	useEffect(() => {
-		if (!(line3BaseDone && line3TypeDone) || line3Complete) {
-			return;
-		}
-		setLine3Complete(true);
-	}, [line3BaseDone, line3TypeDone, line3Complete]);
-
-	useEffect(() => {
-		if (!showLine3) {
+		if (!(line3Visible && hasTyped)) {
 			return;
 		}
 		const targetText = TYPES[activeIndex] ?? "";
-		if (displayedType !== targetText || !hasTyped) {
+		if (displayedType !== targetText) {
 			return;
 		}
-		const sequenceToken = sequenceIdRef.current;
+
 		const timeoutId = window.setTimeout(() => {
-			if (sequenceIdRef.current !== sequenceToken) {
-				return;
-			}
 			setActiveIndex((prev) => (prev + 1) % TYPES.length);
 		}, 700);
 
 		return () => {
 			window.clearTimeout(timeoutId);
 		};
-	}, [showLine3, activeIndex, displayedType, hasTyped]);
+	}, [line3Visible, activeIndex, displayedType, hasTyped]);
 
-	useEffect(() => {
-		if (!(showLine3 && hasTyped)) {
-			return;
-		}
-		setLine3TypeDone(true);
-	}, [showLine3, hasTyped]);
-
-	const sequenceIdSnapshot = sequenceId;
-	const handleLine1Complete = () => {
-		if (sequenceIdRef.current !== sequenceIdSnapshot) {
-			return;
-		}
-		setLine1Complete(true);
-	};
-
-	const handleLine2Complete = () => {
-		if (sequenceIdRef.current !== sequenceIdSnapshot) {
-			return;
-		}
-		setLine2Complete(true);
-	};
-
-	const handleLine3BaseComplete = () => {
-		if (sequenceIdRef.current !== sequenceIdSnapshot) {
-			return;
-		}
-		setLine3BaseDone(true);
-	};
-
-	const handleLine3TypeComplete = () => {
-		if (sequenceIdRef.current !== sequenceIdSnapshot) {
-			return;
-		}
-		setHasTyped(true);
-	};
-
-	const handleLine4Complete = () => {
-		if (sequenceIdRef.current !== sequenceIdSnapshot) {
-			return;
-		}
-		setLine4Complete(true);
-	};
-
-	// Automatic Typewriter logic handling backspaces character-by-character
+	// Typewriter animation: backspace then type character-by-character
 	useEffect(() => {
 		const targetText = TYPES[activeIndex] || "";
 		let isCancelled = false;
+		const isCancelledCheck = () => isCancelled;
 
-		const animateTypewriter = async () => {
+		const findCommonPrefixLength = (a: string, b: string): number => {
+			let len = 0;
+			while (len < a.length && len < b.length && a[len] === b[len]) {
+				len++;
+			}
+			return len;
+		};
+
+		const backspace = async (stopAt: number) => {
+			while (currentTypeRef.current.length > stopAt && !isCancelledCheck()) {
+				currentTypeRef.current = currentTypeRef.current.slice(0, -1);
+				setDisplayedType(currentTypeRef.current);
+				await new Promise((r) => setTimeout(r, 40));
+			}
+		};
+
+		const typeForward = async (target: string) => {
+			while (
+				currentTypeRef.current.length < target.length &&
+				!isCancelledCheck()
+			) {
+				const nextChar = target[currentTypeRef.current.length];
+				currentTypeRef.current += nextChar;
+				setDisplayedType(currentTypeRef.current);
+				await new Promise((r) => setTimeout(r, 80));
+			}
+		};
+
+		const animate = async () => {
 			if (currentTypeRef.current === targetText) {
 				return;
 			}
-			// Find common prefix length
-			let commonPrefixLen = 0;
-			const currentText = currentTypeRef.current;
-			while (
-				commonPrefixLen < currentText.length &&
-				commonPrefixLen < targetText.length &&
-				currentText[commonPrefixLen] === targetText[commonPrefixLen]
-			) {
-				commonPrefixLen++;
-			}
-
-			// Backspace phase
-			await processBackspace(commonPrefixLen);
-
-			// Typing phase
-			await processTyping(targetText);
+			const prefixLen = findCommonPrefixLength(
+				currentTypeRef.current,
+				targetText
+			);
+			await backspace(prefixLen);
+			await typeForward(targetText);
 		};
 
-		const processBackspace = async (commonPrefixLen: number) => {
-			while (currentTypeRef.current.length > commonPrefixLen) {
-				if (isCancelled) {
-					return;
-				}
-				currentTypeRef.current = currentTypeRef.current.slice(0, -1);
-				setDisplayedType(currentTypeRef.current);
-				await new Promise((r) => setTimeout(r, 40)); // Backspace speed
-			}
-		};
-
-		const processTyping = async (targetText: string) => {
-			while (currentTypeRef.current.length < targetText.length) {
-				if (isCancelled) {
-					return;
-				}
-				const nextChar = targetText[currentTypeRef.current.length];
-				currentTypeRef.current += nextChar;
-				setDisplayedType(currentTypeRef.current);
-				await new Promise((r) => setTimeout(r, 80)); // Typing speed
-			}
-		};
-
-		animateTypewriter();
+		animate();
 
 		return () => {
 			isCancelled = true;
@@ -301,7 +255,7 @@ export default function AboutSection() {
 			id="about"
 			ref={sectionRef}
 			style={{
-				backgroundColor: "transparent", // Let the mask show what's underneath
+				backgroundColor: "transparent",
 				position: "relative",
 				width: "100%",
 				minHeight: "100vh",
@@ -318,7 +272,7 @@ export default function AboutSection() {
 					left: 0,
 					right: 0,
 					bottom: 0,
-					backgroundColor: "#000", // Black background inside the circle mask
+					backgroundColor: "#000",
 					padding: "clamp(4rem, 10vw, 8rem) clamp(1.5rem, 5vw, 4rem)",
 					color: "rgba(255, 255, 255, 0.8)",
 					display: "flex",
@@ -333,176 +287,156 @@ export default function AboutSection() {
 						width: "100%",
 						margin: "0 auto",
 						zIndex: 10,
-						paddingBottom: "2rem", // Reduce gap to next section
+						paddingBottom: "2rem",
 					}}
 				>
-					{/* Line 1 */}
+					{/* Line 1 — right-aligned (sender) */}
 					<div
 						style={{
 							minHeight: "4rem",
-							marginBottom: "4rem", // Increased space between chats
+							marginBottom: "4rem",
 							display: "flex",
 							justifyContent: "flex-end",
 						}}
 					>
-						{showLine1 && (
-							<div
-								style={{
-									display: "inline-block",
-									padding: "1rem 1.5rem",
-									backgroundColor: "rgba(255, 255, 255, 0.1)",
-									borderRadius: "1rem 1rem 0 1rem",
-									fontFamily: FONT_MONO,
-									fontSize: "clamp(1.2rem, 3vw, 1.8rem)",
-									color: "rgba(255, 255, 255, 0.6)",
-								}}
-							>
-								<BlurText
-									delay={150}
-									direction="bottom"
-									onAnimationComplete={handleLine1Complete}
-									stepDuration={0.8}
-									text="Who are you!?"
-								/>
-							</div>
-						)}
+						<div
+							ref={line1Ref}
+							style={{
+								display: "inline-block",
+								padding: "1rem 1.5rem",
+								backgroundColor: "rgba(255, 255, 255, 0.1)",
+								borderRadius: "1rem 1rem 0 1rem",
+								fontFamily: FONT_MONO,
+								fontSize: "clamp(1.2rem, 3vw, 1.8rem)",
+								color: "rgba(255, 255, 255, 0.6)",
+								opacity: 0,
+								scale: 0,
+								transformOrigin: "bottom right",
+							}}
+						>
+							Who are you!?
+						</div>
 					</div>
 
-					{/* Line 2 */}
+					{/* Line 2 — left-aligned (receiver) */}
 					<div style={{ minHeight: "4rem", marginBottom: "4rem" }}>
-						{showLine2 && (
-							<div
-								style={{
-									display: "inline-block",
-									padding: "1rem 1.5rem",
-									backgroundColor: "rgba(255, 255, 255, 0.05)",
-									borderRadius: "1rem 1rem 1rem 0",
-									fontFamily: FONT_MONO,
-									fontSize: "clamp(1.2rem, 3vw, 1.8rem)",
-								}}
-							>
-								<BlurText
-									delay={150}
-									onAnimationComplete={handleLine2Complete}
-									stepDuration={0.8}
-									text="hmm, good question..."
-								/>
-							</div>
-						)}
+						<div
+							ref={line2Ref}
+							style={{
+								display: "inline-block",
+								padding: "1rem 1.5rem",
+								backgroundColor: "rgba(255, 255, 255, 0.05)",
+								borderRadius: "1rem 1rem 1rem 0",
+								fontFamily: FONT_MONO,
+								fontSize: "clamp(1.2rem, 3vw, 1.8rem)",
+								opacity: 0,
+								scale: 0,
+								transformOrigin: "bottom left",
+							}}
+						>
+							hmm, good question...
+						</div>
 					</div>
 
-					{/* Line 3 */}
+					{/* Line 3 — left-aligned (receiver, with typewriter) */}
 					<div style={{ minHeight: "4rem", marginBottom: "4rem" }}>
-						{showLine3 && (
-							<div
-								style={{
-									display: "inline-block",
-									padding: "1rem 1.5rem",
-									backgroundColor: "rgba(255, 255, 255, 0.05)",
-									borderRadius: "1rem 1rem 1rem 0",
-									fontFamily: FONT_MONO,
-									fontSize: "clamp(1.2rem, 3vw, 1.8rem)",
-								}}
-							>
-								<div
-									style={{
-										display: "flex",
-										flexWrap: "wrap",
-										alignItems: "center",
-									}}
-								>
-									<BlurText
-										delay={150}
-										onAnimationComplete={handleLine3BaseComplete}
-										stepDuration={0.8}
-										text="I am a "
-									/>
-									<span
-										style={{
-											marginLeft: "0.5rem",
-											color: "#fff",
-											fontFamily: FONT_ACCENT, // Array texts get Telma font
-											fontWeight: "bold",
-											borderRight: "2px solid rgba(255, 255, 255, 0.8)",
-											paddingRight: "4px",
-											minHeight: "1.2em",
-											display: "inline-block",
-										}}
-									>
-										{hasTyped ? (
-											displayedType
-										) : (
-											<BlurText
-												className="m-0"
-												delay={150}
-												onAnimationComplete={handleLine3TypeComplete}
-												stepDuration={0.8}
-												text={TYPES[0]}
-											/>
-										)}
-									</span>
-								</div>
-							</div>
-						)}
-					</div>
-
-					{/* Line 4 */}
-					<div
-						style={{
-							minHeight: "4rem",
-							marginBottom: "4rem", // Increased space
-							display: "flex",
-							justifyContent: "flex-end",
-						}}
-					>
-						{showLine4 && (
-							<div
-								style={{
-									display: "inline-block",
-									padding: "1rem 1.5rem",
-									backgroundColor: "rgba(255, 255, 255, 0.1)",
-									borderRadius: "1rem 1rem 0 1rem",
-									fontFamily: FONT_MONO,
-									fontSize: "clamp(1.2rem, 3vw, 1.8rem)",
-									color: "rgba(255, 255, 255, 0.6)",
-								}}
-							>
-								<BlurText
-									delay={150}
-									direction="bottom"
-									onAnimationComplete={handleLine4Complete}
-									stepDuration={0.8}
-									text="how do you manage all of this stuff!?"
-								/>
-							</div>
-						)}
-					</div>
-
-					{/* Line 5 */}
-					<div style={{ minHeight: "4rem", marginBottom: "0rem" }}>
-						{showLine5 && (
+						<div
+							ref={line3Ref}
+							style={{
+								display: "inline-block",
+								padding: "1rem 1.5rem",
+								backgroundColor: "rgba(255, 255, 255, 0.05)",
+								borderRadius: "1rem 1rem 1rem 0",
+								fontFamily: FONT_MONO,
+								fontSize: "clamp(1.2rem, 3vw, 1.8rem)",
+								opacity: 0,
+								scale: 0,
+								transformOrigin: "bottom left",
+							}}
+						>
 							<div
 								style={{
 									display: "flex",
 									flexWrap: "wrap",
 									alignItems: "center",
-									padding: "1rem 1.5rem",
-									backgroundColor: "rgba(255, 255, 255, 0.05)",
-									borderRadius: "1rem 1rem 1rem 0",
-									fontFamily: FONT_MONO,
-									fontSize: "clamp(1.2rem, 3vw, 1.8rem)",
 								}}
 							>
-								<BlurText delay={150} stepDuration={0.8} text="caffeine cuz " />
-								<span style={{ color: "#fff", fontWeight: "bold" }}>
-									<BlurText
-										delay={150}
-										stepDuration={0.8}
-										text="REDBULL gives you wiiiiinggssssss"
-									/>
+								<span>I am a </span>
+								<span
+									style={{
+										marginLeft: "0.5rem",
+										color: "#fff",
+										fontFamily: FONT_ACCENT,
+										fontWeight: "bold",
+										borderRight: "2px solid rgba(255, 255, 255, 0.8)",
+										paddingRight: "4px",
+										minHeight: "1.2em",
+										display: "inline-block",
+									}}
+								>
+									{displayedType}
 								</span>
 							</div>
-						)}
+						</div>
+					</div>
+
+					{/* Line 4 — right-aligned (sender) */}
+					<div
+						style={{
+							minHeight: "4rem",
+							marginBottom: "4rem",
+							display: "flex",
+							justifyContent: "flex-end",
+						}}
+					>
+						<div
+							ref={line4Ref}
+							style={{
+								display: "inline-block",
+								padding: "1rem 1.5rem",
+								backgroundColor: "rgba(255, 255, 255, 0.1)",
+								borderRadius: "1rem 1rem 0 1rem",
+								fontFamily: FONT_MONO,
+								fontSize: "clamp(1.2rem, 3vw, 1.8rem)",
+								color: "rgba(255, 255, 255, 0.6)",
+								opacity: 0,
+								scale: 0,
+								transformOrigin: "bottom right",
+							}}
+						>
+							how do you manage all of this stuff!?
+						</div>
+					</div>
+
+					{/* Line 5 — left-aligned (receiver) */}
+					<div style={{ minHeight: "4rem", marginBottom: "0rem" }}>
+						<div
+							ref={line5Ref}
+							style={{
+								display: "flex",
+								flexWrap: "wrap",
+								alignItems: "center",
+								padding: "1rem 1.5rem",
+								backgroundColor: "rgba(255, 255, 255, 0.05)",
+								borderRadius: "1rem 1rem 1rem 0",
+								fontFamily: FONT_MONO,
+								fontSize: "clamp(1.2rem, 3vw, 1.8rem)",
+								opacity: 0,
+								scale: 0,
+								transformOrigin: "bottom left",
+							}}
+						>
+							<span>caffeine cuz </span>
+							<span
+								style={{
+									color: "#fff",
+									fontWeight: "bold",
+									marginLeft: "0.5rem",
+								}}
+							>
+								REDBULL gives you wiiiiinggssssss
+							</span>
+						</div>
 					</div>
 				</div>
 			</div>

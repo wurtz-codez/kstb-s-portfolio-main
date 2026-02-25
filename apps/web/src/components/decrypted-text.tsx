@@ -82,7 +82,7 @@ export function DecryptedText({
 	}, []);
 
 	useEffect(() => {
-		if (!(mounted && startWhen)) {
+		if (!mounted) {
 			return;
 		}
 
@@ -97,12 +97,34 @@ export function DecryptedText({
 			}
 		};
 
-		timeoutRef.current = setTimeout(() => {
-			startAnimation();
-		}, delay);
+		if (startWhen) {
+			// If it's the clear text (e.g. first mount with startWhen=true), scramble it during the delay
+			setDisplayText((prev) => {
+				if (prev === text) {
+					return text
+						.split("")
+						.map((char) => (char === " " ? " " : getRandomChar()))
+						.join("");
+				}
+				return prev;
+			});
+
+			timeoutRef.current = setTimeout(() => {
+				startAnimation();
+			}, delay);
+		} else {
+			clearTimers();
+			// scramble the text initially if startWhen is false
+			setDisplayText(
+				text
+					.split("")
+					.map((char) => (char === " " ? " " : getRandomChar()))
+					.join("")
+			);
+		}
 
 		return clearTimers;
-	}, [mounted, startWhen, delay, startAnimation]);
+	}, [mounted, startWhen, delay, startAnimation, text, getRandomChar]);
 
 	return (
 		<span className={className} style={style}>
