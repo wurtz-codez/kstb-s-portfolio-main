@@ -90,25 +90,25 @@ export default function WorksSection() {
 		}
 
 		const ctx = gsap.context(() => {
-			gsap.fromTo(
-				menuEl,
-				{
-					scale: 0.3,
-					opacity: 0,
-					clipPath: "circle(0% at 50% 50%)",
+			const tl = gsap.timeline({
+				scrollTrigger: {
+					trigger: containerEl,
+					start: "top bottom",
+					end: "top top",
+					scrub: 3,
 				},
-				{
-					scale: 1,
-					opacity: 1,
-					clipPath: "circle(150% at 50% 50%)",
-					ease: "power2.out",
-					scrollTrigger: {
-						trigger: containerEl,
-						start: "top 90%",
-						end: "top 10%",
-						scrub: 2,
-					},
-				}
+			});
+
+			tl.fromTo(
+				containerEl,
+				{ clipPath: "circle(0% at 50% 50%)" },
+				{ clipPath: "circle(150% at 50% 50%)", ease: "none" },
+				0
+			).fromTo(
+				menuEl,
+				{ scale: 0.2, opacity: 0 },
+				{ scale: 1, opacity: 1, ease: "power2.out" },
+				0
 			);
 		}, containerEl);
 
