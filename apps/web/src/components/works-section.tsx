@@ -95,14 +95,14 @@ export default function WorksSection() {
 					trigger: containerEl,
 					start: "top bottom",
 					end: "top top",
-					scrub: 3,
+					scrub: 1,
 				},
 			});
 
 			tl.fromTo(
 				menuEl,
-				{ scale: 0.2, opacity: 0 },
-				{ scale: 1, opacity: 1, ease: "power2.out" },
+				{ scale: 0.4, opacity: 0 },
+				{ scale: 1, opacity: 1, ease: "power3.out" },
 				0
 			);
 		}, containerEl);
@@ -124,10 +124,19 @@ export default function WorksSection() {
 				backgroundColor: "#000",
 				zIndex: 10,
 				width: "100%",
+				minHeight: "100vh",
 				paddingTop: "clamp(4rem, 10vw, 8rem)",
 				paddingBottom: "clamp(4rem, 10vw, 8rem)",
 			}}
 		>
+			<div
+				style={{
+					position: "absolute",
+					inset: 0,
+					backgroundColor: "#000",
+					zIndex: -1,
+				}}
+			/>
 			<div
 				ref={menuWrapperRef}
 				style={{
